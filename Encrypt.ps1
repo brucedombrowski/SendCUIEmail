@@ -446,17 +446,27 @@ $fileList
 
 ## How to Decrypt (Windows PowerShell)
 
-### Option 1: One-Liner (Copy & Paste)
+### Option 1: File Picker (Recommended - No Typing Paths)
 
 Open **PowerShell** (Start Menu → type "PowerShell" → Enter), then paste this command:
 
 ``````powershell
-`$f=Read-Host "File";`$p=Read-Host "Password" -AsSecureString;`$d=[IO.File]::ReadAllBytes(`$f);`$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$p)),`$d[0..15],100000,"SHA256");`$a=[Security.Cryptography.Aes]::Create();`$a.Key=`$k.GetBytes(32);`$a.IV=`$d[16..31];`$c=`$a.CreateDecryptor().TransformFinalBlock(`$d,32,`$d.Length-32);[IO.File]::WriteAllBytes(`$f-replace'\.Locked`$','',`$c);Write-Host "Decrypted:"(`$f-replace'\.Locked`$','')
+Add-Type -AssemblyName System.Windows.Forms;`$o=New-Object System.Windows.Forms.OpenFileDialog;`$o.Title="Select .Locked file to decrypt";`$o.Filter="Locked files (*.Locked)|*.Locked|All files (*.*)|*.*";if(`$o.ShowDialog()-eq'OK'){`$f=`$o.FileName;`$p=Read-Host "Password" -AsSecureString;`$b=[IO.File]::ReadAllBytes(`$f);`$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$p)),`$b[0..15],100000,"SHA256");`$a=[Security.Cryptography.Aes]::Create();`$a.Key=`$k.GetBytes(32);`$a.IV=`$b[16..31];`$c=`$a.CreateDecryptor().TransformFinalBlock(`$b,32,`$b.Length-32);`$s=New-Object System.Windows.Forms.SaveFileDialog;`$s.Title="Save decrypted file as";`$s.FileName=[IO.Path]::GetFileName(`$f-replace'\.Locked`$','');`$s.InitialDirectory=[IO.Path]::GetDirectoryName(`$f);if(`$s.ShowDialog()-eq'OK'){[IO.File]::WriteAllBytes(`$s.FileName,`$c);Write-Host "Decrypted: `$(`$s.FileName)" -ForegroundColor Green}}
 ``````
 
-When prompted:
-1. Enter the full path to the .Locked file (e.g., ``C:\Downloads\Document.pdf.Locked``)
-2. Enter the password
+1. **Open dialog** - Browse to and select the .Locked file
+2. **Password prompt** - Enter the password (characters won't appear)
+3. **Save dialog** - Choose where to save the decrypted file (defaults to same folder)
+
+### Option 2: Manual Path Entry
+
+If the file picker doesn't work, use this version instead:
+
+``````powershell
+`$f=Read-Host "Full path to .Locked file";`$p=Read-Host "Password" -AsSecureString;`$d=[IO.File]::ReadAllBytes(`$f);`$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$p)),`$d[0..15],100000,"SHA256");`$a=[Security.Cryptography.Aes]::Create();`$a.Key=`$k.GetBytes(32);`$a.IV=`$d[16..31];`$c=`$a.CreateDecryptor().TransformFinalBlock(`$d,32,`$d.Length-32);[IO.File]::WriteAllBytes(`$f-replace'\.Locked`$','',`$c);Write-Host "Decrypted:"(`$f-replace'\.Locked`$','')
+``````
+
+When prompted, enter the **full path** (e.g., ``C:\Users\YourName\Downloads\Document.pdf.Locked``)
 
 ### Option 2: Step-by-Step Script
 

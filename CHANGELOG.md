@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.7.1] - 2026-01-22
+
+### Changed
+- **Recipient Decryption One-Liner** - Now uses file picker dialogs instead of typing paths
+  - Open dialog to browse and select .Locked file
+  - Save dialog to choose where to save decrypted file
+  - No more path typing errors or System32 working directory issues
+  - README.md instructions updated with new one-liner
+
 ## [0.7.0] - 2026-01-22
 
 ### Added
