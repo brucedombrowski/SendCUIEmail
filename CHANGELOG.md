@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.15.0] - 2026-01-22
+
+### Changed
+- **Data-Driven Traceability** - REQ PDF traceability table now generated from JSON
+  - Added `trace` field to each requirement in JSON (e.g., "§5.1 Salt")
+  - build-requirements-pdf.py generates traceability table dynamically
+  - No more hardcoded requirement IDs in Python script
+  - REQ document bumped to v1.1
+
 ## [0.14.0] - 2026-01-22
 
 ### Changed

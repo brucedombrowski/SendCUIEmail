@@ -278,7 +278,7 @@ Analysis & Review of design documentation or cryptographic parameters \\
 Verification results are documented in the corresponding VER document.
 
 % ============================================================================
-% TRACEABILITY
+% TRACEABILITY (Generated from JSON)
 % ============================================================================
 \section{Requirements Traceability}
 
@@ -286,25 +286,18 @@ Verification results are documented in the corresponding VER document.
 \toprule
 \textbf{Requirement} & \textbf{Standard} & \textbf{Section} \\
 \midrule
-REQ-1.1 & FIPS 197 & \S5 Algorithm Specification \\
-REQ-1.2 & FIPS 197 & \S6.1 Key Length Requirements \\
-REQ-1.3 & NIST SP 800-38A & \S6.2 The Cipher Block Chaining Mode \\
-REQ-1.4 & NIST SP 800-38A & Appendix C Generation of IVs \\
-REQ-1.5 & NIST SP 800-38A & \S5.3 Initialization Vector \\
-REQ-1.6 & NIST SP 800-38A & \S5.3 Initialization Vector \\
-REQ-2.1 & NIST SP 800-132 & \S5.3 PBKDF Specification \\
-REQ-2.2 & NIST SP 800-132 & \S5.3 (PRF selection) \\
-REQ-2.3 & NIST SP 800-132 & \S5.1.1.2 Iteration Count \\
-REQ-2.4--2.6 & NIST SP 800-132 & \S5.1 Salt \\
-REQ-3.1--3.3 & NIST SP 800-90A & \S8.6.7 Get\_entropy\_input \\
-REQ-4.1--4.2 & NIST SP 800-63B & \S5.1.1.1 Memorized Secret Authenticators \\
-REQ-4.3 & NIST SP 800-63B & \S5.1.1.2 Memorized Secret Verifiers \\
-REQ-4.4--4.5 & NIST SP 800-63B & \S5.1.1.2 (storage and display) \\
-REQ-5.1--5.4 & 32 CFR 2002 & \S2002.20 Marking \\
-REQ-6.1--6.2 & FIPS 140-2 & \S4.1 Cryptographic Module Specification \\
-REQ-6.3 & FIPS 140-2 & \S4.9.1 FIPS Mode \\
-REQ-6.4 & 32 CFR 2002 & \S2002.16 Accessing and disseminating \\
-\bottomrule
+"""
+
+    # Generate traceability rows from requirements
+    for req in requirements:
+        req_id = req["id"]
+        std_display = format_standard_id(req["standard"])
+        trace = escape_latex(req.get("trace", ""))
+        # Convert § to LaTeX \S
+        trace = trace.replace("§", r"\S")
+        tex += rf"{req_id} & {std_display} & {trace} \\" + "\n"
+
+    tex += r"""\bottomrule
 \end{tabularx}
 
 % ============================================================================

@@ -63,7 +63,7 @@
 \title{
     \textbf{VER-2026-001} \\
     \Large Cryptographic Compliance Verification \\
-    \large SendCUIEmail v0.14.0
+    \large SendCUIEmail v0.15.0
 }
 \author{Verification Document}
 \date{January 21, 2026}
@@ -77,10 +77,10 @@
 \begin{tabular}{ll}
 \textbf{Document ID:} & VER-2026-001 \\
 \textbf{Subject:} & Cryptographic Implementation Compliance Verification \\
-\textbf{Requirements:} & REQ-2026-001 v1.0 \\
-\textbf{Software Version:} & v0.14.0 \\
-\textbf{Git Commit:} & \texttt{b5a9f1b034c5e3ae43f7fb1ebce09000f65b31e3} \\
-\textbf{Commit Date:} & 2026-01-22 09:43:58 -0600 \\
+\textbf{Requirements:} & REQ-2026-001 v1.1 \\
+\textbf{Software Version:} & v0.15.0 \\
+\textbf{Git Commit:} & \texttt{5bf818957e0dc6eaf2d6d8836b9c14a54de3020b} \\
+\textbf{Commit Date:} & 2026-01-22 09:46:39 -0600 \\
 \textbf{Source File:} & \texttt{Encrypt.ps1} \\
 \end{tabular}
 
@@ -460,7 +460,7 @@ NIST SP 800-171 & 3.13.11 FIPS crypto & Windows CNG & $\checkmark$* \\
 
 \subsection{Encryption/Decryption Round-Trip}
 
-The following test was performed on commit \texttt{b5a9f1b}:
+The following test was performed on commit \texttt{5bf8189}:
 
 \begin{samepage}
 \begin{lstlisting}[language=bash]
@@ -502,7 +502,7 @@ $outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
 \section{Conclusion}
 % ============================================================================
 
-SendCUIEmail v0.14.0 (commit \texttt{b5a9f1b}) demonstrates compliance with:
+SendCUIEmail v0.15.0 (commit \texttt{5bf8189}) demonstrates compliance with:
 
 \begin{itemize}
     \item \textbf{NIST SP 800-132} - All password-based key derivation requirements met
@@ -521,6 +521,6 @@ For full NIST SP 800-171 \S3.13.11 compliance, Windows FIPS mode must be enabled
 \noindent\rule{\textwidth}{0.5pt}
 
 \textbf{Document prepared:} January 21, 2026 \\
-\textbf{Verified against commit:} \texttt{b5a9f1b034c5e3ae43f7fb1ebce09000f65b31e3}
+\textbf{Verified against commit:} \texttt{5bf818957e0dc6eaf2d6d8836b9c14a54de3020b}
 
 \end{document}
