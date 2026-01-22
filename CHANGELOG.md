@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
+### v1.0.0 Target (Non-Technical User Release)
+- Quick-Start Guide PDF
+- Any UX improvements from developer beta feedback
+- Production-ready for non-technical CUI handlers
+
+### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
 ## [0.5.3] - 2026-01-21
