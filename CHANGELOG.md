@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.17.0] - 2026-01-22
+
+### Added
+- **File Picker on Double-Click** - No files needed to start
+  - Double-click `Encrypt.bat` or `Decrypt.bat` to open file picker dialog
+  - Or drag files onto the .bat to skip the picker (still supported)
+  - Makes the tool usable without command-line knowledge
+
+### Changed
+- **Simplified README.html** - Updated sender instructions
+  - Steps reduced from 5 to 3
+  - Clearly shows both double-click and drag-drop options
+  - Removed outdated "Select or drag files" step
+
 ## [0.16.0] - 2026-01-22
 
 ### Added

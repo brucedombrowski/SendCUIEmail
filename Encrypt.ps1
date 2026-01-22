@@ -28,7 +28,7 @@
 #>
 
 param(
-    [Parameter(Mandatory=$true, Position=0, ValueFromRemainingArguments=$true)]
+    [Parameter(Position=0, ValueFromRemainingArguments=$true)]
     [string[]]$Path
 )
 
@@ -881,6 +881,28 @@ $pwdOrgSupport
 
 # Main execution
 Write-Banner
+
+# If no files provided, show file picker dialog
+if (-not $Path -or $Path.Count -eq 0) {
+    Write-Host "No files specified. Opening file picker..." -ForegroundColor Yellow
+    Write-Host ""
+
+    Add-Type -AssemblyName System.Windows.Forms
+    $picker = New-Object System.Windows.Forms.OpenFileDialog
+    $picker.Title = "Select files to encrypt"
+    $picker.Filter = "All files (*.*)|*.*"
+    $picker.Multiselect = $true
+    $picker.InitialDirectory = [Environment]::GetFolderPath('Desktop')
+
+    if ($picker.ShowDialog() -eq 'OK') {
+        $Path = $picker.FileNames
+        Write-Host "Selected $($Path.Count) file(s)" -ForegroundColor Green
+    } else {
+        Write-Host "No files selected. Exiting." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host ""
+}
 
 # Collect files to encrypt
 Write-Host "Scanning for files..." -ForegroundColor Gray
