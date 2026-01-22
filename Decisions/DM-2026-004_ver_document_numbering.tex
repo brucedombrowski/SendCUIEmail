@@ -1,0 +1,235 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-004}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Verification Document (VER) Numbering Policy}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-004 VER Document Numbering Policy},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum establishes the policy for numbering and updating Verification (VER) documents, which provide formal cryptographic compliance verification through code inspection.
+
+% ----------------------------------------------------------------------------
+\dmsection{Decision}
+
+\textbf{VER document IDs remain stable across routine version releases.} A new VER document ID is only assigned when the cryptographic implementation fundamentally changes.
+
+% ----------------------------------------------------------------------------
+\dmsection{Policy Details}
+
+\textbf{Same VER-ID (Dynamic Updates):}
+
+The following changes do \textbf{not} require a new VER document ID:
+\begin{itemize}
+    \item New software version releases (e.g., v0.2.0 $\rightarrow$ v0.3.0)
+    \item Bug fixes unrelated to cryptographic code
+    \item UI/UX changes
+    \item Documentation updates
+    \item Test infrastructure changes
+    \item Line number shifts due to unrelated code additions
+\end{itemize}
+
+For these changes, the existing VER document is updated with:
+\begin{itemize}
+    \item Current version number
+    \item Current git commit hash
+    \item Current commit date
+    \item Updated line number references (if code shifted)
+\end{itemize}
+
+\textbf{New VER-ID Required:}
+
+A new VER document ID (e.g., VER-2026-002) is required when:
+\begin{itemize}
+    \item Encryption algorithm changes (e.g., AES-CBC $\rightarrow$ AES-GCM)
+    \item Key derivation function changes (e.g., PBKDF2 $\rightarrow$ Argon2)
+    \item Iteration count changes (e.g., 100,000 $\rightarrow$ 200,000)
+    \item Key size changes (e.g., 256-bit $\rightarrow$ 512-bit)
+    \item Salt or IV size changes
+    \item Hash algorithm changes (e.g., SHA-256 $\rightarrow$ SHA-512)
+    \item Any change to cryptographic primitives or parameters
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Rationale}
+
+\textbf{Verification by Code Inspection:}
+
+VER documents use ``verification by code inspection''---a gold standard approach where:
+\begin{itemize}
+    \item Each cryptographic requirement is quoted from the authoritative standard
+    \item The corresponding implementation code is shown
+    \item Compliance is demonstrated through direct comparison
+\end{itemize}
+
+\textbf{Why Stable IDs:}
+
+If the cryptographic implementation has not changed, the verification remains valid. The code that was verified in v0.2.0 is the same code in v0.3.0---only the version metadata needs updating.
+
+Creating a new VER-ID for every release would:
+\begin{itemize}
+    \item Imply the cryptographic implementation changed (when it didn't)
+    \item Create unnecessary document management overhead
+    \item Dilute the significance of actual cryptographic changes
+\end{itemize}
+
+\textbf{Why New IDs for Crypto Changes:}
+
+When cryptographic primitives change, a new verification is required because:
+\begin{itemize}
+    \item Different standards sections may apply
+    \item New compliance requirements must be verified
+    \item The previous verification no longer accurately describes the implementation
+    \item Auditors need clear indication that re-verification occurred
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Implementation}
+
+\textbf{Automated Updates via test.sh:}
+
+The \texttt{test.sh} script automatically updates VER documents before PDF compilation:
+
+\begin{itemize}
+    \item Extracts current version from \texttt{CHANGELOG.md}
+    \item Retrieves current git commit hash and date
+    \item Updates VER document title page and metadata using \texttt{sed}
+    \item Compiles updated PDF to \texttt{.builds/test/}
+\end{itemize}
+
+\textbf{Updated Fields:}
+\begin{itemize}
+    \item Title page version (e.g., ``SendCUIEmail v0.3.0'')
+    \item Document info table (Version Tested, Git Commit, Commit Date)
+    \item Test verification section commit reference
+    \item Conclusion version/commit reference
+    \item Footer commit reference
+\end{itemize}
+
+\textbf{Manual Updates Required:}
+
+When line numbers shift due to code changes, the following must be manually updated:
+\begin{itemize}
+    \item Code excerpt line number references in each requirement section
+    \item This ensures the document accurately points to the verified code
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Example Scenarios}
+
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Change} & \textbf{Action} & \textbf{Rationale} \\
+\hline
+v0.2.0 $\rightarrow$ v0.3.0 (no crypto changes) & Update VER-2026-001 & Same crypto code, same verification \\
+\hline
+Add FIPS mode detection UI & Update VER-2026-001 & UI change, crypto unchanged \\
+\hline
+Change iterations 100K $\rightarrow$ 200K & Create VER-2026-002 & Crypto parameter changed \\
+\hline
+Switch AES-CBC to AES-GCM & Create VER-2026-002 & Algorithm changed \\
+\hline
+Add Argon2 as alternative KDF & Create VER-2026-002 & New crypto primitive added \\
+\hline
+\end{tabularx}
+
+% ----------------------------------------------------------------------------
+\dmsection{Document History}
+
+Current VER documents:
+\begin{itemize}
+    \item \textbf{VER-2026-001}: Cryptographic Compliance Verification (NIST SP 800-132, FIPS 197, NIST SP 800-38A, FIPS 140-2)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{References}
+
+\begin{itemize}
+    \item VER-2026-001: Cryptographic Compliance Verification
+    \item NIST SP 800-132: Recommendation for Password-Based Key Derivation
+    \item FIPS 197: Advanced Encryption Standard (AES)
+    \item FIPS 140-2: Security Requirements for Cryptographic Modules
+    \item NIST SP 800-38A: Recommendation for Block Cipher Modes of Operation
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}

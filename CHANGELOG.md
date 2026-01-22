@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - VER-2026-001_cryptographic_compliance.tex - Full cryptographic verification document
+- DM-2026-004: VER document numbering policy (stable IDs across releases)
 - LaTeX-formatted compliance verification with code listings
 - Cross-referenced NIST/FIPS standards
 
