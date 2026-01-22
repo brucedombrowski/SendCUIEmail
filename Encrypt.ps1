@@ -383,6 +383,11 @@ function Get-FilesToEncrypt {
     $files = @()
 
     foreach ($p in $Paths) {
+        # Convert to absolute path if relative
+        if (-not [System.IO.Path]::IsPathRooted($p)) {
+            $p = Join-Path (Get-Location) $p
+        }
+
         if (Test-Path $p -PathType Container) {
             # It's a folder - get all files recursively
             $folderFiles = Get-ChildItem -Path $p -File -Recurse |
@@ -390,9 +395,9 @@ function Get-FilesToEncrypt {
             $files += $folderFiles.FullName
         }
         elseif (Test-Path $p -PathType Leaf) {
-            # It's a file
+            # It's a file - get full absolute path
             if ($p -notlike "*.Locked" -and (Split-Path $p -Leaf) -ne "Decrypt_Instructions.html") {
-                $files += (Resolve-Path $p).Path
+                $files += [System.IO.Path]::GetFullPath($p)
             }
         }
         else {

@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.17.2] - 2026-01-22
+
+### Fixed
+- **Drag-Drop from Different Folders** - Fixed path handling for files dragged from other directories
+  - Now properly resolves absolute paths for files from any location
+  - Output always goes to same folder as source file (no output picker)
+
 ## [0.17.1] - 2026-01-22
 
 ### Fixed

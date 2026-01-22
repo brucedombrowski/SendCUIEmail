@@ -165,9 +165,14 @@ function Get-FilesToDecrypt {
     $files = @()
 
     foreach ($p in $Paths) {
+        # Convert to absolute path if relative
+        if (-not [System.IO.Path]::IsPathRooted($p)) {
+            $p = Join-Path (Get-Location) $p
+        }
+
         if (Test-Path $p -PathType Leaf) {
             if ($p -like "*.Locked") {
-                $files += (Resolve-Path $p).Path
+                $files += [System.IO.Path]::GetFullPath($p)
             }
             else {
                 Write-Host "WARNING: Skipping non-.Locked file: $p" -ForegroundColor Yellow
