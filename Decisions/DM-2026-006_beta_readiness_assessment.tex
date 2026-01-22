@@ -271,6 +271,84 @@ Files ready to send:
 \end{itemize}
 
 % ----------------------------------------------------------------------------
+\dmsection{Beta Success Criteria}
+
+The following criteria define a successful developer beta test:
+
+\subsection*{Required (Must Pass)}
+
+\begin{tabularx}{\textwidth}{|c|X|c|}
+\hline
+\textbf{\#} & \textbf{Criterion} & \textbf{Pass} \\
+\hline
+1 & Encrypt.bat launches without errors on Windows & $\square$ \\
+\hline
+2 & Files encrypt successfully with chosen password & $\square$ \\
+\hline
+3 & .Locked files and README.md are created in output folder & $\square$ \\
+\hline
+4 & Outlook .msg drafts are generated (CUI\_Email and Password\_Email) & $\square$ \\
+\hline
+5 & CUI banner marking appears correctly in email draft & $\square$ \\
+\hline
+6 & Recipient can decrypt using README.md instructions & $\square$ \\
+\hline
+7 & Decrypted files match originals (integrity verified) & $\square$ \\
+\hline
+8 & Wrong password correctly rejected with clear error & $\square$ \\
+\hline
+\end{tabularx}
+
+\subsection*{UX Validation}
+
+\begin{tabularx}{\textwidth}{|c|X|c|}
+\hline
+\textbf{\#} & \textbf{Criterion} & \textbf{Pass} \\
+\hline
+9 & Password hint ``(Characters will not appear...)'' is visible & $\square$ \\
+\hline
+10 & Output folder location is clear and easy to find & $\square$ \\
+\hline
+11 & CUI category selection is understandable & $\square$ \\
+\hline
+12 & Compliance guidance (COMPLIANT/NOT COMPLIANT) is clear & $\square$ \\
+\hline
+13 & No confusing or unclear prompts encountered & $\square$ \\
+\hline
+\end{tabularx}
+
+\subsection*{Success Threshold}
+
+\begin{itemize}
+    \item \textbf{Pass:} All 8 Required criteria pass, and at least 4 of 5 UX criteria pass
+    \item \textbf{Conditional Pass:} All Required pass, but UX feedback requires minor changes
+    \item \textbf{Fail:} Any Required criterion fails
+\end{itemize}
+
+\subsection*{Post-Beta Actions}
+
+\textbf{If Pass:}
+\begin{enumerate}
+    \item Proceed to non-technical user preparation
+    \item Create Quick-Start Guide PDF
+    \item Consider v1.0.0 release candidate
+\end{enumerate}
+
+\textbf{If Conditional Pass:}
+\begin{enumerate}
+    \item Address UX feedback in patch release (v0.5.4)
+    \item Re-test affected areas
+    \item Then proceed to non-technical preparation
+\end{enumerate}
+
+\textbf{If Fail:}
+\begin{enumerate}
+    \item Document failure details
+    \item Fix blocking issues
+    \item Re-run beta test
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
 \dmsection{Version Information}
 
 \begin{tabular}{ll}
