@@ -1,0 +1,260 @@
+{
+  "document": {
+    "id": "REQ-2026-001",
+    "title": "Cryptographic Compliance Requirements",
+    "version": "1.0",
+    "date": "2026-01-22",
+    "status": "Approved"
+  },
+  "standards": [
+    {"id": "32-CFR-2002", "name": "Controlled Unclassified Information Program", "url": "https://www.ecfr.gov/current/title-32/subtitle-B/chapter-XX/part-2002"},
+    {"id": "FIPS-197", "name": "Advanced Encryption Standard (AES)", "url": "https://csrc.nist.gov/pubs/fips/197/final"},
+    {"id": "FIPS-140-2", "name": "Security Requirements for Cryptographic Modules", "url": "https://csrc.nist.gov/pubs/fips/140-2/final"},
+    {"id": "NIST-SP-800-132", "name": "Recommendation for Password-Based Key Derivation", "url": "https://csrc.nist.gov/pubs/sp/800/132/final"},
+    {"id": "NIST-SP-800-171", "name": "Protecting CUI in Nonfederal Systems", "url": "https://csrc.nist.gov/pubs/sp/800/171/r3/final"},
+    {"id": "NIST-SP-800-53", "name": "Security Controls for Federal Systems", "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final"},
+    {"id": "NIST-SP-800-38A", "name": "Recommendation for Block Cipher Modes of Operation", "url": "https://csrc.nist.gov/pubs/sp/800/38/a/final"},
+    {"id": "NIST-SP-800-90A", "name": "Recommendation for Random Number Generation", "url": "https://csrc.nist.gov/pubs/sp/800/90/a/r1/final"},
+    {"id": "NIST-SP-800-63B", "name": "Digital Identity Guidelines - Authentication", "url": "https://csrc.nist.gov/pubs/sp/800/63/b/upd2/final"}
+  ],
+  "requirements": [
+    {
+      "id": "REQ-1.1",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The system SHALL use AES (Advanced Encryption Standard) as defined in FIPS 197 for symmetric encryption.",
+      "standard": "FIPS-197",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-1.2",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The system SHALL use a key length of 256 bits (AES-256) for all encryption operations.",
+      "standard": "FIPS-197",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-1.3",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The system SHALL use Cipher Block Chaining (CBC) mode or an authenticated encryption mode (GCM, CCM).",
+      "standard": "NIST-SP-800-38A",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-1.4",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The system SHALL generate a unique, random Initialization Vector (IV) for each encryption operation.",
+      "standard": "NIST-SP-800-38A",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-1.5",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The IV SHALL be at least 128 bits (16 bytes) for AES-CBC mode.",
+      "standard": "NIST-SP-800-38A",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-1.6",
+      "category": "Encryption Algorithm",
+      "priority": "Mandatory",
+      "description": "The IV SHALL be stored with or transmitted alongside the ciphertext.",
+      "standard": "NIST-SP-800-38A",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.1",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The system SHALL use PBKDF2 (Password-Based Key Derivation Function 2) as defined in NIST SP 800-132 for deriving encryption keys from passwords.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.2",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The system SHALL use HMAC-SHA256 as the pseudorandom function (PRF) for PBKDF2.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.3",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The system SHALL use a minimum of 100,000 iterations for PBKDF2 per NIST SP 800-132 recommendations.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.4",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The system SHALL generate a unique, random salt for each encryption operation.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-2.5",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The salt SHALL be at least 128 bits (16 bytes) as recommended by NIST SP 800-132.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.6",
+      "category": "Key Derivation",
+      "priority": "Mandatory",
+      "description": "The salt SHALL be stored with or transmitted alongside the ciphertext.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-2.7",
+      "category": "Key Derivation",
+      "priority": "Recommended",
+      "description": "The iteration count SHOULD be increased over time as computing power increases.",
+      "standard": "NIST-SP-800-132",
+      "verification": "Analysis"
+    },
+    {
+      "id": "REQ-3.1",
+      "category": "Random Number Generation",
+      "priority": "Mandatory",
+      "description": "The system SHALL use a cryptographically secure random number generator (CSPRNG) for generating salts, IVs, and other cryptographic material.",
+      "standard": "NIST-SP-800-90A",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-3.2",
+      "category": "Random Number Generation",
+      "priority": "Mandatory",
+      "description": "On Windows, the system SHALL use the system RNG provided by .NET (RNGCryptoServiceProvider or RandomNumberGenerator).",
+      "standard": "NIST-SP-800-90A",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-3.3",
+      "category": "Random Number Generation",
+      "priority": "Mandatory",
+      "description": "The CSPRNG SHALL meet the requirements of NIST SP 800-90A or equivalent.",
+      "standard": "NIST-SP-800-90A",
+      "verification": "Analysis"
+    },
+    {
+      "id": "REQ-4.1",
+      "category": "Password",
+      "priority": "Mandatory",
+      "description": "The system SHALL enforce a minimum password length of 8 characters.",
+      "standard": "NIST-SP-800-63B",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-4.2",
+      "category": "Password",
+      "priority": "Mandatory",
+      "description": "The system SHALL require password confirmation during encryption to prevent typos.",
+      "standard": "NIST-SP-800-63B",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-4.3",
+      "category": "Password",
+      "priority": "Recommended",
+      "description": "The system SHOULD offer automatic passphrase generation using cryptographic RNG.",
+      "standard": "NIST-SP-800-63B",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-4.4",
+      "category": "Password",
+      "priority": "Mandatory",
+      "description": "Passwords SHALL NOT be stored or logged by the system.",
+      "standard": "NIST-SP-800-63B",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-4.5",
+      "category": "Password",
+      "priority": "Mandatory",
+      "description": "Password input SHALL be masked (not displayed on screen) during entry.",
+      "standard": "NIST-SP-800-63B",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-5.1",
+      "category": "File Format",
+      "priority": "Mandatory",
+      "description": "Encrypted files SHALL contain: salt, IV, and ciphertext in a defined format.",
+      "standard": "FIPS-140-2",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-5.2",
+      "category": "File Format",
+      "priority": "Mandatory",
+      "description": "The file format SHALL be: [16-byte salt][16-byte IV][ciphertext].",
+      "standard": "FIPS-140-2",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-5.3",
+      "category": "File Format",
+      "priority": "Mandatory",
+      "description": "Encrypted files SHALL use the .Locked extension to indicate encrypted status.",
+      "standard": "32-CFR-2002",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-5.4",
+      "category": "File Format",
+      "priority": "Mandatory",
+      "description": "The original file extension SHALL be preserved (e.g., document.pdf becomes document.pdf.Locked).",
+      "standard": "32-CFR-2002",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-6.1",
+      "category": "Platform",
+      "priority": "Mandatory",
+      "description": "The system SHALL use platform-provided cryptographic libraries (no custom implementations).",
+      "standard": "FIPS-140-2",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-6.2",
+      "category": "Platform",
+      "priority": "Mandatory",
+      "description": "On Windows, the system SHALL use .NET Framework cryptographic classes (System.Security.Cryptography).",
+      "standard": "FIPS-140-2",
+      "verification": "Inspection"
+    },
+    {
+      "id": "REQ-6.3",
+      "category": "Platform",
+      "priority": "Recommended",
+      "description": "The system SHOULD detect and warn if FIPS mode is not enabled on Windows.",
+      "standard": "FIPS-140-2",
+      "verification": "Test"
+    },
+    {
+      "id": "REQ-6.4",
+      "category": "Platform",
+      "priority": "Mandatory",
+      "description": "The system SHALL NOT require installation of third-party software on recipient systems.",
+      "standard": "32-CFR-2002",
+      "verification": "Analysis"
+    }
+  ],
+  "summary": {
+    "total": 28,
+    "mandatory": 25,
+    "recommended": 3,
+    "categories": ["Encryption Algorithm", "Key Derivation", "Random Number Generation", "Password", "File Format", "Platform"]
+  }
+}

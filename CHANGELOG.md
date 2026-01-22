@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.11.0] - 2026-01-22
+
+### Added
+- **Requirements Documentation** - Formal cryptographic requirements in `Requirements/` folder
+  - `REQ-2026-001_cryptographic_compliance.json` - JSON source of truth for 28 requirements
+  - `build-requirements-pdf.py` - Generates LaTeX/PDF from JSON with version-stamped filenames
+  - PDF includes source hash for JSON→PDF traceability
+  - Requirements traced to specific sections in FIPS 197, NIST SP 800-38A, 800-132, 800-90A, 800-63B, FIPS 140-2, 32 CFR 2002
+  - Standards table includes hyperlinks to authoritative NIST/CSRC sources
+
 ## [0.10.0] - 2026-01-22
 
 ### Changed
