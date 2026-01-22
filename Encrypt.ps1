@@ -176,11 +176,49 @@ function Get-CUICategory {
     }
 }
 
+# Word list for passphrase generation (EFF-style short words, easy to communicate)
+$PASSPHRASE_WORDS = @(
+    "apple", "beach", "brave", "bring", "chair", "chief", "class", "cloud",
+    "dance", "draft", "dream", "drink", "earth", "elder", "empty", "equal",
+    "faint", "faith", "feast", "field", "flame", "flash", "float", "floor",
+    "fruit", "giant", "glass", "globe", "grace", "grain", "grape", "grass",
+    "green", "grove", "guide", "happy", "heart", "heavy", "horse", "house",
+    "human", "image", "inner", "juice", "knife", "lemon", "level", "light",
+    "liver", "lodge", "lunar", "magic", "maple", "march", "medal", "metal",
+    "model", "money", "month", "motor", "mouse", "music", "noble", "north",
+    "novel", "ocean", "olive", "onion", "orbit", "other", "outer", "paint",
+    "panel", "paper", "peace", "pearl", "phone", "piano", "pilot", "pixel",
+    "plain", "plant", "plate", "plaza", "plum", "point", "polar", "power",
+    "pride", "prime", "print", "prize", "proof", "proud", "queen", "quick",
+    "quiet", "radio", "rapid", "raven", "reach", "realm", "rider", "river",
+    "robin", "robot", "rocky", "round", "royal", "salad", "scale", "scene",
+    "scout", "seven", "shade", "shape", "sharp", "sheep", "shell", "shift",
+    "shine", "shore", "shown", "sight", "silky", "silver", "simple", "skill"
+)
+
+function New-Passphrase {
+    param([int]$WordCount = 4)
+
+    $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $words = @()
+
+    for ($i = 0; $i -lt $WordCount; $i++) {
+        $bytes = New-Object byte[] 4
+        $rng.GetBytes($bytes)
+        $index = [Math]::Abs([BitConverter]::ToInt32($bytes, 0)) % $PASSPHRASE_WORDS.Count
+        $words += $PASSPHRASE_WORDS[$index]
+    }
+
+    $rng.Dispose()
+    return ($words -join "-")
+}
+
 function Get-SecurePassword {
     param([int]$MaxAttempts = 3)
 
-    Write-Host "Password Requirements:" -ForegroundColor Yellow
-    Write-Host "  - Minimum 8 characters" -ForegroundColor Gray
+    Write-Host "Password Options:" -ForegroundColor Yellow
+    Write-Host "  - Enter your own password (minimum 8 characters)" -ForegroundColor Gray
+    Write-Host "  - Press Enter for auto-generated passphrase (recommended)" -ForegroundColor Gray
     Write-Host "  - Will be transmitted out-of-band (phone, SMS, in-person)" -ForegroundColor Gray
     Write-Host ""
 
@@ -190,13 +228,37 @@ function Get-SecurePassword {
             Write-Host "Attempt $attempt of $MaxAttempts" -ForegroundColor Yellow
         }
 
-        Write-Host "(Characters will not appear as you type)" -ForegroundColor Gray
+        Write-Host "(Characters will not appear as you type, or press Enter for auto-generate)" -ForegroundColor Gray
         $password = Read-Host "Enter encryption password" -AsSecureString
+
+        # Convert to plain text (cross-platform)
+        $plain1 = ConvertFrom-SecureStringPlain -SecureString $password
+
+        # Check if user wants auto-generated passphrase
+        if ([string]::IsNullOrEmpty($plain1)) {
+            $passphrase = New-Passphrase -WordCount 4
+            Write-Host ""
+            Write-Host "Generated passphrase:" -ForegroundColor Green
+            Write-Host "  $passphrase" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "IMPORTANT: Save this passphrase now - you will share it separately!" -ForegroundColor Yellow
+            Write-Host ""
+
+            $confirm = Read-Host "Press Enter to accept, or type 'new' for a different passphrase"
+            while ($confirm -eq "new") {
+                $passphrase = New-Passphrase -WordCount 4
+                Write-Host ""
+                Write-Host "Generated passphrase:" -ForegroundColor Green
+                Write-Host "  $passphrase" -ForegroundColor Cyan
+                Write-Host ""
+                $confirm = Read-Host "Press Enter to accept, or type 'new' for a different passphrase"
+            }
+
+            return $passphrase
+        }
+
         Write-Host "(Characters will not appear as you type)" -ForegroundColor Gray
         $confirm = Read-Host "Confirm password" -AsSecureString
-
-        # Convert to plain text for comparison (cross-platform)
-        $plain1 = ConvertFrom-SecureStringPlain -SecureString $password
         $plain2 = ConvertFrom-SecureStringPlain -SecureString $confirm
 
         if ($plain1 -ne $plain2) {
