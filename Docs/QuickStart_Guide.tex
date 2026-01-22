@@ -49,25 +49,32 @@
 \section*{Before You Begin: Choose the Right Method}
 
 \colorbox{lightgreen}{\parbox{\dimexpr\textwidth-2\fboxsep}{
-\textbf{PREFERRED: S/MIME Encrypted Email}\\[3pt]
-If you have your recipient's S/MIME certificate (PIV, CAC, or other), use S/MIME:
+\textbf{OPTION 1: S/MIME Only (Both Parties Have PIV/CAC)}\\[3pt]
+If you have your recipient's S/MIME certificate, you can use S/MIME alone:
 \begin{enumerate}[leftmargin=0.3in, topsep=2pt, itemsep=0pt]
     \item Compose your email in Outlook with CUI files attached
-    \item Click \textbf{Sign} (proves it's from you) and \textbf{Encrypt} (only they can read it)
-    \item The email is automatically secured end-to-end -- no password needed
+    \item Click \textbf{Sign} and \textbf{Encrypt} before sending
 \end{enumerate}
 }}
 
 \vspace{6pt}
 
-\textbf{Use SendCUIEmail when:}
+\colorbox{cuiyellow}{\parbox{\dimexpr\textwidth-2\fboxsep}{
+\textbf{OPTION 2: S/MIME + SendCUIEmail (Maximum Protection)}\\[3pt]
+For defense-in-depth, use \textbf{both} S/MIME and SendCUIEmail together:
 \begin{itemize}[leftmargin=0.3in, topsep=2pt, itemsep=0pt]
-    \item You don't have the recipient's S/MIME certificate
-    \item Your recipient doesn't have PKI capability (no PIV/CAC/S/MIME)
-    \item You need to send CUI to external partners or contractors
+    \item Files are encrypted with a password (content protection)
+    \item Email is signed and encrypted with S/MIME (transport protection)
+    \item Password sent separately (out-of-band delivery)
 \end{itemize}
+\textbf{Why?} If email is accidentally forwarded or misdirected, files remain encrypted. Separating password from content minimizes accidental leakage.
+}}
 
-\textbf{TIP:} Even when using SendCUIEmail, \textbf{sign your email} if you have a PIV/CAC. This proves the email came from you (authenticity) even though the recipient can't receive S/MIME encrypted mail.
+\vspace{6pt}
+
+\textbf{OPTION 3: SendCUIEmail Only} -- Use when recipient lacks PKI capability (no PIV/CAC/S/MIME), such as external partners or contractors.
+
+\textbf{TIP:} Always \textbf{sign your email} if you have a PIV/CAC -- this proves it came from you.
 
 \vspace{-0.1in}
 
