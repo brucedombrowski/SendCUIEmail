@@ -737,6 +737,9 @@ Write-Host ""
 
 # Determine and display output location upfront
 $outputDir = Split-Path $files[0] -Parent
+if ([string]::IsNullOrEmpty($outputDir)) {
+    $outputDir = Get-Location
+}
 Write-Host "Output folder:" -ForegroundColor Yellow
 Write-Host "  $outputDir" -ForegroundColor White
 Write-Host ""
@@ -751,8 +754,11 @@ foreach ($file in $files) {
     if ($result) {
         Write-Host " Done" -ForegroundColor Green
         $encryptedFiles += $result
-        if ($null -eq $outputDir) {
+        if ([string]::IsNullOrEmpty($outputDir)) {
             $outputDir = Split-Path $result -Parent
+            if ([string]::IsNullOrEmpty($outputDir)) {
+                $outputDir = Get-Location
+            }
         }
     }
     else {

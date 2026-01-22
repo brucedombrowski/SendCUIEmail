@@ -240,6 +240,9 @@ Write-Host ""
 
 if ($decryptedFiles.Count -gt 0) {
     $decryptDir = Split-Path $decryptedFiles[0] -Parent
+    if ([string]::IsNullOrEmpty($decryptDir)) {
+        $decryptDir = Get-Location
+    }
     Write-Host "Output folder:" -ForegroundColor Yellow
     Write-Host "  $decryptDir" -ForegroundColor White
     Write-Host ""
