@@ -7,23 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- **Quick-Start Guide PDF** - 2-page guide in Docs/QuickStart_Guide.pdf
-  - Part A: Encrypting Files (Sender) - 5 steps with color-coded boxes
-  - Part B: Decrypting Files (Recipient) - 5 steps
-  - Password visibility warning and compliance guidance
-- **Auto-Generated Passphrase** - Press Enter at password prompt for secure passphrase
-  - 4-word passphrase using cryptographic RNG (e.g., "beach-flame-ocean-pride")
-  - Aligns with NIST guidance: length > complexity
-  - Type "new" to regenerate if desired
-
 ### v1.0.0 Target (Non-Technical User Release)
-- ~~Quick-Start Guide PDF~~ (done)
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
+
+## [0.6.0] - 2026-01-21
+
+### Added
+- **Quick-Start Guide PDF** - 2-page guide in Docs/QuickStart_Guide.pdf
+  - Part A: Encrypting Files (Sender) - 5 steps with color-coded boxes
+  - Part B: Decrypting Files (Recipient) - 5 steps
+  - S/MIME security hierarchy guidance (3 options for different scenarios)
+  - Defense-in-depth rationale for combining S/MIME + file encryption
+- **Auto-Generated Passphrase** - Press Enter at password prompt for secure passphrase
+  - 4-word passphrase using cryptographic RNG (e.g., "beach-flame-ocean-pride")
+  - Aligns with NIST SP 800-63B guidance: length > complexity
+  - Type "new" to regenerate if desired
+- **Output Folder Shown at Start** - Path displayed before encryption begins
+- **Explorer Tip on Windows** - Shows `explorer.exe` command to open output folder
+
+### Fixed
+- Password delivery guidance now correctly lists S/MIME encrypted email as compliant
 
 ## [0.5.3] - 2026-01-21
 
