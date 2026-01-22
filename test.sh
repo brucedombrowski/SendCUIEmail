@@ -245,7 +245,7 @@ CONTROLLED UNCLASSIFIED INFORMATION (CUI)
 ================================================================================
 
 This email contains Controlled Unclassified Information (CUI) that requires
-safeguarding per 32 CFR Part 2002 and NIST SP 800-171.
+safeguarding per 32 CFR Part 2002.
 
 ENCRYPTED FILES ATTACHED:
   - small_text.txt.Locked
@@ -430,7 +430,7 @@ fi
 
 if [ $TOTAL_FAILED -eq 0 ]; then
     # Compile verification document if pdflatex is available
-    VER_TEX="${SCRIPT_DIR}/Decisions/VER-2026-001_cryptographic_compliance.tex"
+    VER_TEX="${SCRIPT_DIR}/Verifications/VER-2026-001_cryptographic_compliance.tex"
     if [ -f "$VER_TEX" ] && command -v pdflatex &> /dev/null; then
         echo ""
         echo -e "${CYAN}================================================${NC}"
@@ -438,7 +438,7 @@ if [ $TOTAL_FAILED -eq 0 ]; then
         echo -e "${CYAN}================================================${NC}"
         echo ""
 
-        pushd "${SCRIPT_DIR}/Decisions" > /dev/null
+        pushd "${SCRIPT_DIR}/Verifications" > /dev/null
 
         # Get current git info for verification document
         GIT_COMMIT_FULL=$(git rev-parse HEAD)

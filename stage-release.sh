@@ -113,36 +113,12 @@ else
     echo -e "  ${YELLOW}No [Unreleased] section found${NC}"
 fi
 
-# Step 2: Update version in Quick-Start Guide
-echo ""
-echo -e "${CYAN}[2/4] Updating Quick-Start Guide version...${NC}"
-if [ -f "Docs/QuickStart_Guide.tex" ]; then
-    CURRENT_VER=$(grep -o 'SendCUIEmail v[0-9.]*' Docs/QuickStart_Guide.tex | head -1 | sed 's/SendCUIEmail v//')
-    if [ "$CURRENT_VER" != "$VERSION" ]; then
-        sed -i.bak "s/SendCUIEmail v[0-9.]*/SendCUIEmail v$VERSION/g" Docs/QuickStart_Guide.tex
-        rm -f Docs/QuickStart_Guide.tex.bak
-        echo -e "  Updated: v$CURRENT_VER -> v$VERSION"
-
-        # Recompile PDF
-        echo -e "  Compiling PDF..."
-        cd Docs
-        pdflatex -interaction=nonstopmode QuickStart_Guide.tex > /dev/null 2>&1 || true
-        rm -f QuickStart_Guide.{aux,log}
-        cd "$SCRIPT_DIR"
-        echo -e "  ${GREEN}PDF compiled${NC}"
-    else
-        echo -e "  Already at v$VERSION"
-    fi
-else
-    echo -e "  ${YELLOW}QuickStart_Guide.tex not found${NC}"
-fi
-
-# Step 3: Run tests
+# Step 2: Run tests
 echo ""
 if [ "$SKIP_TESTS" = true ]; then
-    echo -e "${CYAN}[3/4] Skipping tests (--skip-tests)${NC}"
+    echo -e "${CYAN}[2/3] Skipping tests (--skip-tests)${NC}"
 else
-    echo -e "${CYAN}[3/4] Running tests...${NC}"
+    echo -e "${CYAN}[2/3] Running tests...${NC}"
     if [ -x "$SCRIPT_DIR/test.sh" ]; then
         if ! "$SCRIPT_DIR/test.sh"; then
             echo -e "${RED}ERROR: Tests failed. Fix issues before releasing.${NC}"
@@ -153,9 +129,9 @@ else
     fi
 fi
 
-# Step 4: Show summary
+# Step 3: Show summary
 echo ""
-echo -e "${CYAN}[4/4] Release staging summary...${NC}"
+echo -e "${CYAN}[3/3] Release staging summary...${NC}"
 echo ""
 
 # Show git status
@@ -164,10 +140,9 @@ git status --short
 
 echo ""
 echo -e "${YELLOW}Files to be included in release:${NC}"
-echo "  - Encrypt.bat, Encrypt.ps1, Encrypt.sh"
-echo "  - Decrypt.bat, Decrypt.ps1, Decrypt.sh"
-echo "  - README.md, LICENSE"
-echo "  - Docs/QuickStart_Guide.pdf"
+echo "  - Encrypt.bat, Encrypt.ps1"
+echo "  - Decrypt.bat, Decrypt.ps1"
+echo "  - Open_PowerShell.bat, LICENSE"
 
 echo ""
 echo -e "${GREEN}================================================${NC}"

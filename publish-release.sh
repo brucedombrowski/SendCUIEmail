@@ -201,12 +201,6 @@ for file in "${RELEASE_FILES[@]}"; do
     fi
 done
 
-# Copy QuickStart Guide if exists
-if [ -f "Docs/QuickStart_Guide.pdf" ]; then
-    cp "Docs/QuickStart_Guide.pdf" "$RELEASE_DIR/SendCUIEmail/"
-    echo -e "  + QuickStart_Guide.pdf"
-fi
-
 # Create zip
 cd "$RELEASE_DIR"
 zip -r "$ZIP_NAME" SendCUIEmail > /dev/null

@@ -426,7 +426,7 @@ function Generate-HtmlInstructions {
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Segoe UI, -apple-system, Arial, sans-serif; line-height: 1.5; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
-        .banner { background: #FFC107; padding: 12px 20px; text-align: center; font-weight: bold; margin-bottom: 20px; border-radius: 4px; }
+        .banner { background: #2196F3; color: white; padding: 12px 20px; text-align: center; font-weight: bold; margin-bottom: 20px; border-radius: 4px; }
         .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h1 { color: #1a1a1a; font-size: 24px; margin-bottom: 8px; }
         h2 { color: #2196F3; font-size: 18px; margin-bottom: 12px; border-bottom: 2px solid #2196F3; padding-bottom: 4px; }
@@ -446,7 +446,7 @@ function Generate-HtmlInstructions {
     </style>
 </head>
 <body>
-    <div class="banner">$($CUICategory.Full)</div>
+    <div class="banner">Decryption Instructions</div>
 
     <div class="card">
         <h1>How to Decrypt Your Files</h1>
@@ -485,13 +485,21 @@ $fileListHtml
         <div class="step">
             <div class="step-num">1</div>
             <div class="step-content">
+                <div class="step-title">Save the attached files</div>
+                <p>Download all <code>.Locked</code> files from the email to a folder on your computer (e.g., Desktop or Downloads).</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
                 <div class="step-title">Open PowerShell</div>
                 <p>Press <strong>Win+X</strong> then click <strong>"Windows PowerShell"</strong> or <strong>"Terminal"</strong></p>
             </div>
         </div>
 
         <div class="step">
-            <div class="step-num">2</div>
+            <div class="step-num">3</div>
             <div class="step-content">
                 <div class="step-title">Copy and paste this command</div>
                 <p>Click the box below to select all, then press Ctrl+C to copy:</p>
@@ -500,7 +508,7 @@ $fileListHtml
         </div>
 
         <div class="step">
-            <div class="step-num">3</div>
+            <div class="step-num">4</div>
             <div class="step-content">
                 <div class="step-title">Paste into PowerShell and press Enter</div>
                 <p>Right-click in PowerShell to paste, then press Enter.</p>
@@ -508,7 +516,7 @@ $fileListHtml
         </div>
 
         <div class="step">
-            <div class="step-num">4</div>
+            <div class="step-num">5</div>
             <div class="step-content">
                 <div class="step-title">Select your .Locked file</div>
                 <p>A file picker will open. Navigate to and select the <code>.Locked</code> file you want to decrypt.</p>
@@ -516,7 +524,7 @@ $fileListHtml
         </div>
 
         <div class="step">
-            <div class="step-num">5</div>
+            <div class="step-num">6</div>
             <div class="step-content">
                 <div class="step-title">Enter the password</div>
                 <p>Type the password you received (characters won't appear - this is normal).</p>
@@ -524,7 +532,7 @@ $fileListHtml
         </div>
 
         <div class="step">
-            <div class="step-num">6</div>
+            <div class="step-num">7</div>
             <div class="step-content">
                 <div class="step-title">Save the decrypted file</div>
                 <p>A save dialog will open with the original filename. Click Save.</p>
@@ -532,7 +540,7 @@ $fileListHtml
         </div>
 
         <div class="tip">
-            <strong>Tip:</strong> Repeat steps 3-6 for each <code>.Locked</code> file. Use the same password for all files.
+            <strong>Tip:</strong> Repeat steps 4-7 for each <code>.Locked</code> file. Use the same password for all files.
         </div>
     </div>
 
@@ -673,7 +681,7 @@ $($CUICategory.Full)
 ================================================================================
 
 This email contains Controlled Unclassified Information (CUI) that requires
-safeguarding per 32 CFR Part 2002 and NIST SP 800-171.
+safeguarding per 32 CFR Part 2002.
 
 ENCRYPTED FILES ATTACHED:
 $fileListText

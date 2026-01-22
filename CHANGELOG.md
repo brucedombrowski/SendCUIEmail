@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.10.0] - 2026-01-22
+
+### Changed
+- **Simplified Regulatory Reference** - Email body now references only `32 CFR Part 2002`
+  - Applies to both federal and non-federal systems (NIST SP 800-171/800-53 are implementation details)
+- **HTML Banner Correction** - Decrypt_Instructions.html banner changed from CUI yellow to informational blue
+  - Instructions file is not CUI; only the encrypted content is CUI
+- **HTML Step 1 Added** - "Save the attached files" now first step in Quick Method
+  - Recipients reminded to download .Locked files before decrypting
+- **Repo Structure Cleanup** - Reorganized folders and removed redundant files
+  - VER documents moved to `Verifications/` (separate from `Decisions/`)
+  - Removed: QuickStart_Guide.pdf, examples/, old release.sh, .dist/
+
+### Removed
+- **QuickStart_Guide.pdf** - Eliminated from release zip
+  - Redundant: tool guides senders interactively, HTML guides recipients
+
 ## [0.9.0] - 2026-01-22
 
 ### Added
