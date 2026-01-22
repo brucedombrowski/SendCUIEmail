@@ -4,6 +4,16 @@
 
 set -e
 
+# Get script directory (needed early for log file)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Create .builds directory and set up logging
+mkdir -p "${SCRIPT_DIR}/.builds"
+LOG_FILE="${SCRIPT_DIR}/.builds/test_$(date +%Y%m%d_%H%M%S).log"
+
+# Redirect all output to both console and log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -15,6 +25,8 @@ echo ""
 echo -e "${CYAN}================================================${NC}"
 echo -e "${CYAN}  SendCUIEmail - Test Suite (macOS/Linux)${NC}"
 echo -e "${CYAN}================================================${NC}"
+echo ""
+echo "Log file: ${LOG_FILE}"
 echo ""
 
 # Check for PowerShell Core
@@ -30,9 +42,6 @@ fi
 
 echo -e "${GREEN}Found PowerShell Core:${NC} $(pwsh --version)"
 echo ""
-
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Ensure testdata exists
 TESTDATA_DIR="${SCRIPT_DIR}/testdata"
@@ -370,6 +379,43 @@ if [ -f "$BUILD_DIR/README.md" ]; then
 fi
 
 if [ $TOTAL_FAILED -eq 0 ]; then
+    # Compile verification document if pdflatex is available
+    VER_TEX="${SCRIPT_DIR}/Decisions/VER-2026-001_cryptographic_compliance.tex"
+    if [ -f "$VER_TEX" ] && command -v pdflatex &> /dev/null; then
+        echo ""
+        echo -e "${CYAN}================================================${NC}"
+        echo -e "${CYAN}  Compiling Verification Document${NC}"
+        echo -e "${CYAN}================================================${NC}"
+        echo ""
+
+        pushd "${SCRIPT_DIR}/Decisions" > /dev/null
+
+        # Run pdflatex twice for cross-references
+        echo -n "  Compiling VER-2026-001... "
+        if pdflatex -interaction=nonstopmode VER-2026-001_cryptographic_compliance.tex > /dev/null 2>&1 && \
+           pdflatex -interaction=nonstopmode VER-2026-001_cryptographic_compliance.tex > /dev/null 2>&1; then
+            echo -e "${GREEN}Done${NC}"
+
+            # Clean up auxiliary files
+            rm -f VER-2026-001_cryptographic_compliance.aux \
+                  VER-2026-001_cryptographic_compliance.log \
+                  VER-2026-001_cryptographic_compliance.out \
+                  VER-2026-001_cryptographic_compliance.toc 2>/dev/null
+
+            # Copy PDF to .builds
+            cp VER-2026-001_cryptographic_compliance.pdf "${BUILD_DIR}/"
+            echo -e "  ${GREEN}✓${NC} VER-2026-001_cryptographic_compliance.pdf"
+        else
+            echo -e "${YELLOW}Failed (check LaTeX installation)${NC}"
+        fi
+
+        popd > /dev/null
+    elif [ -f "$VER_TEX" ]; then
+        echo ""
+        echo -e "${YELLOW}  Skipping verification PDF (pdflatex not installed)${NC}"
+    fi
+
+    echo ""
     echo -e "${GREEN}================================================${NC}"
     echo -e "${GREEN}  ALL TESTS PASSED!${NC}"
     echo -e "${GREEN}================================================${NC}"

@@ -10,6 +10,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.2.0] - 2026-01-21
+
+### Added
+- **FIPS Mode Detection**
+  - Automatic detection of Windows FIPS mode via registry key
+  - Visual warning when FIPS mode is disabled
+  - FIPS status displayed in completion summary
+
+- **Cryptographic Compliance Verification**
+  - VER-2026-001: Formal verification document for cryptographic compliance
+  - Line-by-line code verification against NIST SP 800-132 and FIPS 197
+  - Compliance summary matrix with verification status
+
+- **Test Infrastructure**
+  - Test output logging to `.builds/test_YYYYMMDD_HHMMSS.log`
+  - Automatic PDF compilation of verification document when tests pass
+  - Console output preserved while logging to file
+
+### Changed
+- Test script now produces verification PDF in `.builds/test/` directory
+- Improved test output organization
+
+### Documentation
+- VER-2026-001_cryptographic_compliance.tex - Full cryptographic verification document
+- LaTeX-formatted compliance verification with code listings
+- Cross-referenced NIST/FIPS standards
+
 ## [0.1.0] - 2026-01-21
 
 ### Added

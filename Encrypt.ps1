@@ -41,6 +41,42 @@ $IV_SIZE = 16         # bytes (128 bits for AES block size)
 # Platform detection
 $IsWindowsPlatform = $PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows
 
+# FIPS mode detection (Windows only)
+function Test-FIPSMode {
+    if (-not $IsWindowsPlatform) {
+        # FIPS mode check only applies to Windows
+        return @{
+            Enabled = $false
+            Applicable = $false
+            Message = "FIPS mode check not applicable (non-Windows platform)"
+        }
+    }
+
+    try {
+        $fipsKey = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy"
+        $fipsValue = Get-ItemProperty -Path $fipsKey -Name "Enabled" -ErrorAction Stop
+        $enabled = $fipsValue.Enabled -eq 1
+
+        return @{
+            Enabled = $enabled
+            Applicable = $true
+            Message = if ($enabled) {
+                "Windows FIPS mode: ENABLED (CMVP #4515 validated)"
+            } else {
+                "Windows FIPS mode: DISABLED"
+            }
+        }
+    }
+    catch {
+        # Registry key doesn't exist or can't be read
+        return @{
+            Enabled = $false
+            Applicable = $true
+            Message = "Windows FIPS mode: DISABLED (policy not configured)"
+        }
+    }
+}
+
 # Cross-platform SecureString to plain text conversion
 function ConvertFrom-SecureStringPlain {
     param([System.Security.SecureString]$SecureString)
@@ -77,6 +113,21 @@ function Write-Banner {
     Write-Host "  FIPS 140-2 / NIST SP 800-171 Compliant" -ForegroundColor Cyan
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
+
+    # Check and display FIPS mode status
+    $fipsStatus = Test-FIPSMode
+    if ($fipsStatus.Applicable) {
+        if ($fipsStatus.Enabled) {
+            Write-Host $fipsStatus.Message -ForegroundColor Green
+        }
+        else {
+            Write-Host "WARNING: $($fipsStatus.Message)" -ForegroundColor Yellow
+            Write-Host "  For full NIST SP 800-171 section 3.13.11 compliance, enable FIPS mode:" -ForegroundColor Yellow
+            Write-Host "  secpol.msc -> Local Policies -> Security Options ->" -ForegroundColor Gray
+            Write-Host "  'System cryptography: Use FIPS compliant algorithms...'" -ForegroundColor Gray
+            Write-Host ""
+        }
+    }
 }
 
 function Get-CUICategory {
@@ -622,6 +673,18 @@ if ($encryptedFiles.Count -gt 0) {
     Write-Host "================================================" -ForegroundColor Green
     Write-Host "  Encryption Complete!" -ForegroundColor Green
     Write-Host "  $($cuiCategory.Short)" -ForegroundColor Yellow
+
+    # Show FIPS status in summary
+    $fipsStatus = Test-FIPSMode
+    if ($fipsStatus.Applicable) {
+        if ($fipsStatus.Enabled) {
+            Write-Host "  FIPS Mode: ENABLED" -ForegroundColor Green
+        }
+        else {
+            Write-Host "  FIPS Mode: DISABLED (see warning above)" -ForegroundColor Yellow
+        }
+    }
+
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Files ready to send:" -ForegroundColor Cyan
