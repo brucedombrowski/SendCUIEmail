@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.16.0] - 2026-01-22
+
+### Added
+- **Sender README** - `README.html` now included in release zip
+  - Quick start guide for senders (encrypting files)
+  - Step-by-step encryption and sending instructions
+  - Password delivery compliance guidance
+  - Troubleshooting section
+  - Matches styling of recipient's `Decrypt_Instructions.html`
+
 ## [0.15.0] - 2026-01-22
 
 ### Changed

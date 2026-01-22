@@ -189,6 +189,7 @@ RELEASE_FILES=(
     "Decrypt.bat"
     "Decrypt.ps1"
     "Open_PowerShell.bat"
+    "README.html"
     "LICENSE"
 )
 
