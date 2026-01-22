@@ -21,26 +21,7 @@ shift
 goto argloop
 :endargs
 
-REM If no arguments, show usage
-if "!ARGS!"=="" (
-    echo.
-    echo SendCUIEmail - File Encryption Tool
-    echo ====================================
-    echo.
-    echo Usage:
-    echo   - Drag files or folders onto Encrypt.bat
-    echo   - Or run: Encrypt.bat file1.pdf file2.docx
-    echo   - Or run: Encrypt.bat "C:\Folder\To\Encrypt"
-    echo.
-    echo Output:
-    echo   - Creates .Locked files alongside originals
-    echo   - Generates README.md with decryption instructions
-    echo.
-    pause
-    exit /b 1
-)
-
-REM Run PowerShell script with execution policy bypass
+REM Run PowerShell script (will show file picker if no files provided)
 powershell -ExecutionPolicy Bypass -NoProfile -File "%~dp0Encrypt.ps1" !ARGS!
 
 pause

@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.17.1] - 2026-01-22
+
+### Fixed
+- **File Picker Actually Works** - Removed .bat usage message that blocked file picker
+  - Double-click now properly opens PowerShell with file picker dialog
+  - .bat files no longer exit early when no arguments provided
+
 ## [0.17.0] - 2026-01-22
 
 ### Added

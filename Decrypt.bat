@@ -21,24 +21,7 @@ shift
 goto argloop
 :endargs
 
-REM If no arguments, show usage
-if "!ARGS!"=="" (
-    echo.
-    echo SendCUIEmail - File Decryption Tool
-    echo ====================================
-    echo.
-    echo Usage:
-    echo   - Drag .Locked files onto Decrypt.bat
-    echo   - Or run: Decrypt.bat file1.pdf.Locked file2.docx.Locked
-    echo.
-    echo Output:
-    echo   - Creates decrypted files with .Locked extension removed
-    echo.
-    pause
-    exit /b 1
-)
-
-REM Run PowerShell script with execution policy bypass
+REM Run PowerShell script (will show file picker if no files provided)
 powershell -ExecutionPolicy Bypass -NoProfile -File "%~dp0Decrypt.ps1" !ARGS!
 
 pause
