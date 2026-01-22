@@ -1,0 +1,188 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-005}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Multiple CUI Subcategory Selection Support}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-005 Multiple CUI Subcategory Selection},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum documents the decision to support multiple CUI subcategory selection in SendCUIEmail, enabling proper CUI banner markings per 32 CFR Part 2002.
+
+% ----------------------------------------------------------------------------
+\dmsection{Decision}
+
+\textbf{SendCUIEmail now supports selecting multiple CUI subcategories.} Users can combine subcategories (e.g., SP-CTI and SP-EXPT) to create proper compound markings like \texttt{CUI//SP-CTI//SP-EXPT}.
+
+% ----------------------------------------------------------------------------
+\dmsection{Regulatory Basis}
+
+\textbf{32 CFR Part 2002.20(a)(3)} states:
+
+\begin{quote}
+``When CUI is designated by more than one Safeguarding or Disseminating Control, authorized holders may use an abbreviated marking that combines the Controls. The abbreviation includes the word CUI or the CUI acronym followed by two slashes, the category or subcategory abbreviation, two more slashes, and so forth for each additional category or subcategory.''
+\end{quote}
+
+\textbf{Example from 32 CFR:} \texttt{CUI//SP-CTI//SP-EXPT}
+
+This marking indicates information that is both Controlled Technical Information \textbf{and} Export Controlled.
+
+% ----------------------------------------------------------------------------
+\dmsection{Implementation}
+
+\textbf{Previous Behavior (v0.1.0--v0.4.0):}
+\begin{itemize}
+    \item Single selection from predefined options
+    \item Options: CUI, CUI//SP-CTI, CUI//SP-EXPT, CUI//SP-PRVCY, CUI//SP-PROPIN
+    \item Could not combine subcategories
+\end{itemize}
+
+\textbf{New Behavior (v0.5.0+):}
+\begin{itemize}
+    \item Multi-select using comma-separated input (e.g., ``1,2'' for CTI+EXPT)
+    \item Generates proper compound marking: \texttt{CUI//SP-CTI//SP-EXPT}
+    \item Option 0 or empty input defaults to basic \texttt{CUI}
+    \item Invalid selections fall back to basic \texttt{CUI} with warning
+\end{itemize}
+
+\textbf{User Interface:}
+
+\begin{verbatim}
+Select CUI Subcategories (can select multiple per 32 CFR Part 2002):
+
+  [0] CUI (basic - no subcategory)
+  [1] SP-CTI - Controlled Technical Information
+  [2] SP-EXPT - Export Controlled
+  [3] SP-PRVCY - Privacy
+  [4] SP-PROPIN - Proprietary Business Information
+
+Enter selection(s) separated by commas (e.g., '1,2' for CTI+EXPT)
+Or press Enter for basic CUI
+
+Selection: 1,2
+\end{verbatim}
+
+Result: \texttt{CUI//SP-CTI//SP-EXPT}
+
+% ----------------------------------------------------------------------------
+\dmsection{Supported Subcategories}
+
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Code} & \textbf{Abbreviation} & \textbf{Description} \\
+\hline
+1 & SP-CTI & Controlled Technical Information \\
+\hline
+2 & SP-EXPT & Export Controlled (ITAR/EAR) \\
+\hline
+3 & SP-PRVCY & Privacy (PII, HIPAA, etc.) \\
+\hline
+4 & SP-PROPIN & Proprietary Business Information \\
+\hline
+\end{tabularx}
+
+\vspace{12pt}
+
+\textbf{Common Combinations:}
+\begin{itemize}
+    \item \texttt{CUI//SP-CTI//SP-EXPT} -- Technical info that is also export controlled
+    \item \texttt{CUI//SP-PRVCY//SP-PROPIN} -- Privacy data that is also proprietary
+    \item \texttt{CUI//SP-CTI//SP-PRVCY} -- Technical info containing PII
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Backward Compatibility}
+
+\textbf{Existing encrypted files remain fully compatible.} The CUI marking is stored in the README.md and email templates, not in the encrypted file format. Files encrypted with previous versions can still be decrypted with current or future versions.
+
+% ----------------------------------------------------------------------------
+\dmsection{References}
+
+\begin{itemize}
+    \item 32 CFR Part 2002 -- Controlled Unclassified Information
+    \item 32 CFR 2002.20 -- Marking
+    \item NIST SP 800-171 -- Protecting Controlled Unclassified Information
+    \item CUI Registry: \url{https://www.archives.gov/cui/registry}
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}

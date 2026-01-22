@@ -98,12 +98,12 @@ function ConvertFrom-SecureStringPlain {
 }
 
 # CUI Categories per 32 CFR Part 2002
-$CUI_CATEGORIES = @{
-    "1" = @{ Short = "CUI"; Full = "CONTROLLED UNCLASSIFIED INFORMATION (CUI)" }
-    "2" = @{ Short = "CUI//SP-CTI"; Full = "CUI//SP-CTI (Controlled Technical Information)" }
-    "3" = @{ Short = "CUI//SP-EXPT"; Full = "CUI//SP-EXPT (Export Controlled)" }
-    "4" = @{ Short = "CUI//SP-PRVCY"; Full = "CUI//SP-PRVCY (Privacy)" }
-    "5" = @{ Short = "CUI//SP-PROPIN"; Full = "CUI//SP-PROPIN (Proprietary Business Information)" }
+# CUI subcategories (can be combined per 32 CFR Part 2002)
+$CUI_SUBCATEGORIES = @{
+    "1" = @{ Code = "SP-CTI"; Full = "Controlled Technical Information" }
+    "2" = @{ Code = "SP-EXPT"; Full = "Export Controlled" }
+    "3" = @{ Code = "SP-PRVCY"; Full = "Privacy" }
+    "4" = @{ Code = "SP-PROPIN"; Full = "Proprietary Business Information" }
 }
 
 function Write-Banner {
@@ -131,18 +131,49 @@ function Write-Banner {
 }
 
 function Get-CUICategory {
-    Write-Host "Select CUI Category:" -ForegroundColor Yellow
+    Write-Host "Select CUI Subcategories (can select multiple per 32 CFR Part 2002):" -ForegroundColor Yellow
     Write-Host ""
-    foreach ($key in ($CUI_CATEGORIES.Keys | Sort-Object)) {
-        Write-Host "  [$key] $($CUI_CATEGORIES[$key].Full)" -ForegroundColor White
+    Write-Host "  [0] CUI (basic - no subcategory)" -ForegroundColor White
+    foreach ($key in ($CUI_SUBCATEGORIES.Keys | Sort-Object)) {
+        Write-Host "  [$key] $($CUI_SUBCATEGORIES[$key].Code) - $($CUI_SUBCATEGORIES[$key].Full)" -ForegroundColor White
     }
     Write-Host ""
+    Write-Host "Enter selection(s) separated by commas (e.g., '1,2' for CTI+EXPT)" -ForegroundColor Gray
+    Write-Host "Or press Enter for basic CUI" -ForegroundColor Gray
+    Write-Host ""
 
-    do {
-        $selection = Read-Host "Enter selection (1-5)"
-    } while (-not $CUI_CATEGORIES.ContainsKey($selection))
+    $selection = Read-Host "Selection"
 
-    return $CUI_CATEGORIES[$selection]
+    # Default to basic CUI if empty or 0
+    if ([string]::IsNullOrWhiteSpace($selection) -or $selection -eq "0") {
+        return @{
+            Short = "CUI"
+            Full = "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
+        }
+    }
+
+    # Parse comma-separated selections
+    $selections = $selection -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $CUI_SUBCATEGORIES.ContainsKey($_) } | Sort-Object -Unique
+
+    if ($selections.Count -eq 0) {
+        Write-Host "Invalid selection, defaulting to basic CUI" -ForegroundColor Yellow
+        return @{
+            Short = "CUI"
+            Full = "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
+        }
+    }
+
+    # Build the combined marking (e.g., CUI//SP-CTI//SP-EXPT)
+    $codes = $selections | ForEach-Object { $CUI_SUBCATEGORIES[$_].Code }
+    $shortMarking = "CUI//" + ($codes -join "//")
+
+    $fullNames = $selections | ForEach-Object { $CUI_SUBCATEGORIES[$_].Full }
+    $fullMarking = "$shortMarking (" + ($fullNames -join ", ") + ")"
+
+    return @{
+        Short = $shortMarking
+        Full = $fullMarking
+    }
 }
 
 function Get-SecurePassword {
