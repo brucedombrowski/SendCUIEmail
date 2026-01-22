@@ -168,20 +168,20 @@ for file in small_text.txt empty.txt binary_sample.bin; do
     fi
 done
 
-# Check for README.md
-if [ -f "${BUILD_DIR}/README.md" ]; then
-    SIZE=$(ls -lh "${BUILD_DIR}/README.md" | awk '{print $5}')
-    echo -e "  ${GREEN}✓${NC} README.md (${SIZE})"
+# Check for Decrypt_Instructions.html
+if [ -f "${BUILD_DIR}/Decrypt_Instructions.html" ]; then
+    SIZE=$(ls -lh "${BUILD_DIR}/Decrypt_Instructions.html" | awk '{print $5}')
+    echo -e "  ${GREEN}✓${NC} Decrypt_Instructions.html (${SIZE})"
 
     # Verify PowerShell one-liner is present
-    if grep -q 'Rfc2898DeriveBytes' "${BUILD_DIR}/README.md"; then
+    if grep -q 'Rfc2898DeriveBytes' "${BUILD_DIR}/Decrypt_Instructions.html"; then
         echo -e "    ${GREEN}✓${NC} Contains PowerShell decryption one-liner"
     else
         echo -e "    ${RED}✗${NC} Missing PowerShell decryption one-liner"
         ((FILE_TESTS_FAILED++))
     fi
 else
-    echo -e "  ${RED}✗${NC} README.md - MISSING"
+    echo -e "  ${RED}✗${NC} Decrypt_Instructions.html - MISSING"
     ((FILE_TESTS_FAILED++))
 fi
 
@@ -203,7 +203,7 @@ else
 SAMPLE: CUI_Email.msg body content (would be generated on Windows with Outlook)
 ================================================================================
 
-Subject: CUI - Encrypted Files - See README for Decryption Instructions
+Subject: CUI - Encrypted Files - See Decrypt_Instructions.html
 
 Body:
 --------------------------------------------------------------------------------
@@ -224,11 +224,11 @@ BEFORE YOU SEND THIS EMAIL:
 
 3. REVIEW ATTACHMENTS
    - Verify the correct .Locked files are attached
-   - Verify README.md is attached
+   - Verify Decrypt_Instructions.html is attached
    - Remove any files that should not be sent
 
 4. TEST DECRYPTION (recommended for first-time use)
-   - Before sending, decrypt one file yourself using the README instructions
+   - Before sending, decrypt one file yourself using the HTML instructions
    - Confirms the password works and files are intact
 
 5. PLAN PASSWORD DELIVERY
@@ -251,11 +251,11 @@ ENCRYPTED FILES ATTACHED:
   - small_text.txt.Locked
   - empty.txt.Locked
   - binary_sample.bin.Locked
-  - README.md (Decryption Instructions)
+  - Decrypt_Instructions.html (Decryption Instructions)
 
 DECRYPTION:
 The attached files are encrypted using AES-256 (FIPS 140-2 compliant).
-Please refer to the attached README.md for step-by-step decryption instructions.
+Please open Decrypt_Instructions.html in your browser for step-by-step decryption instructions.
 You will need the password, which will be provided via separate communication.
 
 HANDLING REQUIREMENTS:
@@ -263,6 +263,11 @@ HANDLING REQUIREMENTS:
 - Do not forward without authorization
 - Store on approved systems only
 - Destroy when no longer needed per retention requirements
+
+DIGITAL SIGNATURE REQUEST:
+If you have a PIV/CAC card or other email signing capability, please reply to
+this email with a digitally signed message to confirm receipt. This helps
+establish trust and supports compliance verification.
 
 ================================================================================
 CONTROLLED UNCLASSIFIED INFORMATION (CUI)
@@ -272,7 +277,7 @@ Attachments:
 - small_text.txt.Locked
 - empty.txt.Locked
 - binary_sample.bin.Locked
-- README.md
+- Decrypt_Instructions.html
 ================================================================================
 EMAILEOF
 
@@ -414,11 +419,12 @@ echo ""
 ls -la "$BUILD_DIR"/ 2>/dev/null
 echo ""
 echo -e "${CYAN}Files ready for recipient:${NC}"
-ls "$BUILD_DIR"/*.Locked "$BUILD_DIR"/README.md 2>/dev/null | xargs -I{} basename {}
+ls "$BUILD_DIR"/*.Locked "$BUILD_DIR"/Decrypt_Instructions.html 2>/dev/null | xargs -I{} basename {}
 echo ""
-if [ -f "$BUILD_DIR/README.md" ]; then
-    echo -e "${CYAN}PowerShell one-liner from README.md:${NC}"
-    grep -A1 '```powershell' "$BUILD_DIR/README.md" | grep -v '```' | head -1
+if [ -f "$BUILD_DIR/Decrypt_Instructions.html" ]; then
+    echo -e "${CYAN}PowerShell one-liner from Decrypt_Instructions.html:${NC}"
+    # Extract one-liner from HTML code-box div
+    grep -o 'class="code-box"[^>]*>[^<]*' "$BUILD_DIR/Decrypt_Instructions.html" | sed 's/class="code-box"[^>]*>//' | head -1
     echo ""
 fi
 

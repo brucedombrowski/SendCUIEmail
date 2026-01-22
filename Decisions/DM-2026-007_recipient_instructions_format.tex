@@ -1,0 +1,165 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{amssymb}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-007}
+\newcommand{\DocumentDate}{January 22, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Recipient Instructions Format}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-007 Recipient Instructions Format},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% Define colors
+\definecolor{passgreen}{RGB}{34,139,34}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OPR:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+\dmsection{Decision}
+
+Replace \texttt{README.md} with \texttt{Decrypt\_Instructions.html} for recipient decryption instructions.
+
+\textbf{Status:} \textcolor{passgreen}{APPROVED}
+
+\dmsection{Context}
+
+Recipients receiving encrypted CUI files need clear instructions to decrypt them. The current \texttt{README.md} file:
+\begin{itemize}
+    \item Requires markdown rendering (GitHub, VS Code) to display properly
+    \item Appears as raw text with formatting characters in Notepad
+    \item Not user-friendly for non-technical recipients
+\end{itemize}
+
+\dmsection{Options Evaluated}
+
+\begin{tabularx}{\textwidth}{l c X X}
+\toprule
+\textbf{Option} & \textbf{Size} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+README.md (current) & \textasciitilde2 KB & Simple, tech-friendly & Ugly in Notepad, requires markdown viewer \\
+\textbf{HTML (selected)} & \textasciitilde5-10 KB & Universal browser support, styled, professional & Some orgs may block HTML attachments \\
+PDF & \textasciitilde50-100 KB & Professional, prints well & Large file size, requires PDF reader \\
+HTML + PDF & \textasciitilde60-110 KB & Maximum compatibility & Redundant, large \\
+\bottomrule
+\end{tabularx}
+
+\dmsection{Rationale}
+
+\begin{enumerate}[label=\alph*.]
+    \item \textbf{Universal access}: Every Windows user has a browser (Edge is built-in)
+    \item \textbf{Professional appearance}: Styled with CUI banner, color-coded steps
+    \item \textbf{Copy-paste friendly}: One-liner in monospace code box, easy to select
+    \item \textbf{Small footprint}: \textasciitilde5-10 KB with inline CSS
+    \item \textbf{Self-contained}: No external dependencies, works offline
+    \item \textbf{Fallback}: Password\_Email includes the one-liner if HTML is blocked
+\end{enumerate}
+
+\dmsection{Implementation}
+
+\begin{itemize}
+    \item Generate \texttt{Decrypt\_Instructions.html} instead of \texttt{README.md}
+    \item Include inline CSS (no external stylesheets)
+    \item Match QuickStart\_Guide.pdf visual style (CUI yellow banner, blue steps)
+    \item Include file picker one-liner in copy-friendly format
+    \item Update CUI\_Email.msg to reference HTML file instead of README.md
+    \item Add ``Before You Start'' FAQ section to anticipate recipient questions
+\end{itemize}
+
+\dmsection{File Size Target}
+
+\begin{itemize}
+    \item Maximum: 15 KB (including all inline CSS)
+    \item Expected: 5-10 KB
+\end{itemize}
+
+\dmsection{Compatibility}
+
+\begin{itemize}
+    \item \textbf{Windows}: Edge, Chrome, Firefox (all built-in or common)
+    \item \textbf{macOS}: Safari, Chrome, Firefox
+    \item \textbf{Mobile}: Standard mobile browsers
+    \item \textbf{Offline}: Works without internet (inline CSS)
+\end{itemize}
+
+\end{enumerate}
+
+\vspace{0.5in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle\\
+\DocumentDate
+
+\end{document}

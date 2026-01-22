@@ -11,8 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
-### Backlog
-- Request for signed email reply feature (draft email requesting recipient's digital signature)
+## [0.9.0] - 2026-01-22
+
+### Added
+- **HTML Decryption Instructions** - Replaced README.md with styled HTML file
+  - `Decrypt_Instructions.html` with professional styling, CUI banner, color-coded steps
+  - "Before You Start" FAQ section anticipating common recipient questions
+  - Click-to-select code box for easy one-liner copy/paste
+  - Compliance info as fine print in footer (AES-256, PBKDF2, NIST references)
+  - Works offline with inline CSS, ~8 KB file size
+  - Decision documented in DM-2026-007
+- **Digital Signature Request** - CUI_Email now requests signed reply
+  - Recipients with PIV/CAC asked to reply with digitally signed message
+  - Supports compliance verification and trust establishment
+
+### Changed
+- Email subject line updated to reference `Decrypt_Instructions.html`
+- Email body updated with new HTML file references
+- All README.md references throughout codebase updated to HTML
+
+### Documentation
+- DM-2026-007: Recipient Instructions Format decision memo (LaTeX/PDF)
 
 ## [0.8.0] - 2026-01-22
 
