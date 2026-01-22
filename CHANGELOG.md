@@ -14,6 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.8.0] - 2026-01-22
+
+### Added
+- **Minimal Release Zip** - GitHub releases now include a downloadable zip for end users
+  - `SendCUIEmail-vX.Y.Z.zip` attached to each release
+  - Contains only essential files: Encrypt.bat, Encrypt.ps1, Decrypt.bat, Decrypt.ps1, Open_PowerShell.bat, LICENSE, QuickStart_Guide.pdf
+  - End users download zip; developers clone full repo for source and tests
+- **Release Workflow Improvements**
+  - `publish-release.sh` now creates and attaches minimal zip automatically
+  - Release notes distinguish between end user download and developer clone
+
 ## [0.7.2] - 2026-01-22
 
 ### Added

@@ -170,22 +170,71 @@ git push origin main
 git push origin "$TAG"
 echo -e "  ${GREEN}Pushed commits and tag${NC}"
 
-# Step 5: Create GitHub release
+# Step 5: Create minimal release zip
 echo ""
-echo -e "${CYAN}[5/5] Creating GitHub release...${NC}"
+echo -e "${CYAN}[5/6] Creating release zip...${NC}"
+RELEASE_DIR="$SCRIPT_DIR/.release"
+ZIP_NAME="SendCUIEmail-v$VERSION.zip"
+ZIP_PATH="$RELEASE_DIR/$ZIP_NAME"
+
+# Clean and create release directory
+rm -rf "$RELEASE_DIR"
+mkdir -p "$RELEASE_DIR/SendCUIEmail"
+
+# Copy essential files for end users
+RELEASE_FILES=(
+    "Encrypt.bat"
+    "Encrypt.ps1"
+    "Decrypt.bat"
+    "Decrypt.ps1"
+    "Open_PowerShell.bat"
+    "LICENSE"
+)
+
+for file in "${RELEASE_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        cp "$file" "$RELEASE_DIR/SendCUIEmail/"
+        echo -e "  + $file"
+    else
+        echo -e "  ${YELLOW}! $file not found${NC}"
+    fi
+done
+
+# Copy QuickStart Guide if exists
+if [ -f "Docs/QuickStart_Guide.pdf" ]; then
+    cp "Docs/QuickStart_Guide.pdf" "$RELEASE_DIR/SendCUIEmail/"
+    echo -e "  + QuickStart_Guide.pdf"
+fi
+
+# Create zip
+cd "$RELEASE_DIR"
+zip -r "$ZIP_NAME" SendCUIEmail > /dev/null
+cd "$SCRIPT_DIR"
+echo -e "  ${GREEN}Created: $ZIP_NAME${NC}"
+
+# Step 6: Create GitHub release
+echo ""
+echo -e "${CYAN}[6/6] Creating GitHub release...${NC}"
 if command -v gh &> /dev/null; then
     # Build release notes for GitHub
     GH_NOTES="## What's New in v$VERSION
 
 $RELEASE_NOTES
 
+## Download
+
+**For end users:** Download \`$ZIP_NAME\` below - contains everything needed to encrypt/decrypt files.
+
+**For developers:** Clone the repository for full source, tests, and documentation.
+
 See [CHANGELOG.md](CHANGELOG.md) for full details."
 
     gh release create "$TAG" \
         --title "v$VERSION" \
-        --notes "$GH_NOTES"
+        --notes "$GH_NOTES" \
+        "$ZIP_PATH"
 
-    echo -e "  ${GREEN}GitHub release created${NC}"
+    echo -e "  ${GREEN}GitHub release created with zip attachment${NC}"
 
     # Get release URL
     RELEASE_URL=$(gh release view "$TAG" --json url -q .url)
@@ -194,7 +243,11 @@ See [CHANGELOG.md](CHANGELOG.md) for full details."
 else
     echo -e "  ${YELLOW}GitHub CLI (gh) not installed. Skipping GitHub release.${NC}"
     echo "  Create manually at: https://github.com/brucedombrowski/SendCUIEmail/releases/new"
+    echo "  Attach: $ZIP_PATH"
 fi
+
+# Cleanup release directory
+rm -rf "$RELEASE_DIR"
 
 # Summary
 echo ""
@@ -207,5 +260,9 @@ echo "  - Tag: $TAG"
 echo "  - Commits pushed to main"
 if command -v gh &> /dev/null; then
     echo "  - GitHub release created"
+    echo "  - Release zip: $ZIP_NAME (attached to release)"
 fi
+echo ""
+echo "End users: Download the zip from the GitHub release"
+echo "Developers: Clone the full repo for source and tests"
 echo ""
