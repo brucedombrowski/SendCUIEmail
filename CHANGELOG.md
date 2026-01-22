@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.14.0] - 2026-01-22
+
+### Changed
+- **VER Document Clarity** - Clearer version labeling in verification document
+  - "Version Tested" renamed to "Software Version" (e.g., v0.14.0)
+  - "Requirements" now shows REQ document version (e.g., REQ-2026-001 v1.0)
+  - test.sh auto-extracts REQ version from JSON and updates VER document
+  - Distinguishes software release version from requirements document version
+
 ## [0.13.0] - 2026-01-22
 
 ### Fixed

@@ -466,15 +466,21 @@ if [ $TOTAL_FAILED -eq 0 ]; then
             VERSION=$(grep -E '^\#\# \[[0-9]+\.[0-9]+\.[0-9]+\]' "${SCRIPT_DIR}/CHANGELOG.md" | head -1 | sed 's/.*\[\([0-9.]*\)\].*/\1/')
         fi
 
+        # Extract REQ version from JSON
+        REQ_VERSION=$(grep '"version"' "${SCRIPT_DIR}/Requirements/REQ-2026-001_cryptographic_compliance.json" | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/')
+
         echo "  Updating verification document with current commit info..."
-        echo "    Version: v${VERSION}"
+        echo "    Software: v${VERSION}"
+        echo "    Requirements: REQ-2026-001 v${REQ_VERSION}"
         echo "    Commit: ${GIT_COMMIT_SHORT}"
 
         # Update version and commit info in .tex file using sed
         # Title page version
         sed -i.bak "s/SendCUIEmail v[0-9.]*$/SendCUIEmail v${VERSION}/" VER-2026-001_cryptographic_compliance.tex
-        # Document info table
-        sed -i.bak "s/Version Tested:} & v[0-9.]*/Version Tested:} \& v${VERSION}/" VER-2026-001_cryptographic_compliance.tex
+        # Document info table - Requirements version
+        sed -i.bak "s/Requirements:} & REQ-2026-001 v[0-9.]*/Requirements:} \& REQ-2026-001 v${REQ_VERSION}/" VER-2026-001_cryptographic_compliance.tex
+        # Document info table - Software version
+        sed -i.bak "s/Software Version:} & v[0-9.]*/Software Version:} \& v${VERSION}/" VER-2026-001_cryptographic_compliance.tex
         sed -i.bak "s/Git Commit:} & \\\\texttt{[a-f0-9]*}/Git Commit:} \& \\\\texttt{${GIT_COMMIT_FULL}}/" VER-2026-001_cryptographic_compliance.tex
         sed -i.bak "s/Commit Date:} & [0-9-]* [0-9:]* [-+][0-9]*/Commit Date:} \& ${GIT_COMMIT_DATE}/" VER-2026-001_cryptographic_compliance.tex
         # Test verification section
