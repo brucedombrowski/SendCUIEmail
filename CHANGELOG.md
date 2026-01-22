@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.6.1] - 2026-01-22
+
+### Fixed
+- **Empty Path Error** - Fixed "cannot bind argument to Path" error when encrypting files without full path
+  - `Split-Path -Parent` returns empty for files like `document.pdf` vs `C:\path\document.pdf`
+  - Now defaults to current directory when parent path is empty
+
+### Added
+- **Release Scripts** - New two-step release workflow
+  - `stage-release.sh` - Prepares release (updates versions, compiles docs, runs tests)
+  - `publish-release.sh` - Publishes release (commits, tags, pushes, creates GitHub release)
+
 ## [0.6.0] - 2026-01-21
 
 ### Added
