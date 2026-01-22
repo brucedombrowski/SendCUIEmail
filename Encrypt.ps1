@@ -190,7 +190,9 @@ function Get-SecurePassword {
             Write-Host "Attempt $attempt of $MaxAttempts" -ForegroundColor Yellow
         }
 
+        Write-Host "(Characters will not appear as you type)" -ForegroundColor Gray
         $password = Read-Host "Enter encryption password" -AsSecureString
+        Write-Host "(Characters will not appear as you type)" -ForegroundColor Gray
         $confirm = Read-Host "Confirm password" -AsSecureString
 
         # Convert to plain text for comparison (cross-platform)
@@ -723,23 +725,24 @@ if ($encryptedFiles.Count -gt 0) {
 
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
+    Write-Host "Output folder:" -ForegroundColor Yellow
+    Write-Host "  $outputDir" -ForegroundColor White
+    Write-Host ""
     Write-Host "Files ready to send:" -ForegroundColor Cyan
     foreach ($ef in $encryptedFiles) {
-        Write-Host "  - $(Split-Path $ef -Leaf)" -ForegroundColor White
+        Write-Host "  $ef" -ForegroundColor White
     }
-    Write-Host "  - README.md" -ForegroundColor White
+    Write-Host "  $(Join-Path $outputDir 'README.md')" -ForegroundColor White
     if ($msgPath) {
         Write-Host ""
         Write-Host "Email drafts created:" -ForegroundColor Cyan
-        Write-Host "  1. $(Split-Path $msgPath -Leaf)" -ForegroundColor White
+        Write-Host "  1. $msgPath" -ForegroundColor White
         Write-Host "     (Encrypted files + README)" -ForegroundColor Gray
         if ($pwdMsgPath) {
-            Write-Host "  2. $(Split-Path $pwdMsgPath -Leaf)" -ForegroundColor White
+            Write-Host "  2. $pwdMsgPath" -ForegroundColor White
             Write-Host "     (Password only - SEND SEPARATELY or use alternate channel)" -ForegroundColor Gray
         }
     }
-    Write-Host ""
-    Write-Host "Location: $outputDir" -ForegroundColor Gray
     Write-Host ""
     Write-Host "PASSWORD TRANSMISSION (per NIST SP 800-63B):" -ForegroundColor Yellow
     Write-Host "  [COMPLIANT] Phone call, SMS, or in-person" -ForegroundColor Green

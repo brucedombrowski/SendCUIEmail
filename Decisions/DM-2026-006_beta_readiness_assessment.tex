@@ -223,12 +223,61 @@ Video walkthrough & \textcolor{failred}{$\times$} & Not yet created \\
 \end{enumerate}
 
 % ----------------------------------------------------------------------------
+\dmsection{Implementation Plan (v0.5.3)}
+
+The following improvements will be implemented before developer beta testing:
+
+\subsection*{Priority 1: Password Entry Hint}
+
+\textbf{Problem:} SecureString input shows no characters; users think nothing is happening.
+
+\textbf{Solution:} Add hint line before each password prompt:
+\begin{verbatim}
+(Characters will not appear as you type)
+Enter encryption password:
+\end{verbatim}
+
+\textbf{Files Modified:}
+\begin{itemize}
+    \item \texttt{Encrypt.ps1} -- Get-SecurePassword function (2 prompts)
+    \item \texttt{Decrypt.ps1} -- Get-Password function (1 prompt)
+\end{itemize}
+
+\subsection*{Priority 2: Output Location Clarity}
+
+\textbf{Problem:} Output folder shown in gray at bottom, easy to miss.
+
+\textbf{Solution:} Move output folder to top of file list with yellow label and full paths:
+\begin{verbatim}
+Output folder:
+  C:\Users\Dev\Documents\SendCUIEmail_20260121_143022
+
+Files ready to send:
+  C:\Users\Dev\Documents\SendCUIEmail_20260121_143022\Document.pdf.Locked
+  C:\Users\Dev\Documents\SendCUIEmail_20260121_143022\README.md
+\end{verbatim}
+
+\textbf{Files Modified:}
+\begin{itemize}
+    \item \texttt{Encrypt.ps1} -- Final summary section
+    \item \texttt{Decrypt.ps1} -- Final summary section
+\end{itemize}
+
+\subsection*{Deferred Items}
+
+\begin{itemize}
+    \item \textbf{Weak Password Warning} -- Deferred for developer beta; add if feedback indicates need
+    \item \textbf{Quick-Start Guide PDF} -- Deferred until non-technical user release
+\end{itemize}
+
+% ----------------------------------------------------------------------------
 \dmsection{Version Information}
 
 \begin{tabular}{ll}
 \textbf{Version Assessed:} & v0.5.2 \\
 \textbf{Assessment Date:} & January 21, 2026 \\
 \textbf{Git Commit:} & \texttt{9f87a00} \\
+\textbf{Implementation Target:} & v0.5.3 \\
 \end{tabular}
 
 \end{enumerate}

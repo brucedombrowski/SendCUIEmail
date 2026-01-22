@@ -62,6 +62,7 @@ function Write-Banner {
 function Get-Password {
     param([int]$MaxAttempts = 3)
 
+    Write-Host "(Characters will not appear as you type)" -ForegroundColor Gray
     $password = Read-Host "Enter decryption password" -AsSecureString
 
     # Convert to plain text (cross-platform)
@@ -238,9 +239,13 @@ Write-Host "================================================" -ForegroundColor G
 Write-Host ""
 
 if ($decryptedFiles.Count -gt 0) {
+    $decryptDir = Split-Path $decryptedFiles[0] -Parent
+    Write-Host "Output folder:" -ForegroundColor Yellow
+    Write-Host "  $decryptDir" -ForegroundColor White
+    Write-Host ""
     Write-Host "Successfully decrypted:" -ForegroundColor Green
     foreach ($df in $decryptedFiles) {
-        Write-Host "  - $(Split-Path $df -Leaf)" -ForegroundColor White
+        Write-Host "  $df" -ForegroundColor White
     }
 }
 
@@ -248,16 +253,11 @@ if ($failedFiles.Count -gt 0) {
     Write-Host ""
     Write-Host "Failed to decrypt:" -ForegroundColor Red
     foreach ($ff in $failedFiles) {
-        Write-Host "  - $(Split-Path $ff -Leaf)" -ForegroundColor Red
+        Write-Host "  $ff" -ForegroundColor Red
     }
     Write-Host ""
     Write-Host "Possible causes:" -ForegroundColor Yellow
     Write-Host "  - Wrong password" -ForegroundColor Yellow
     Write-Host "  - Corrupted file" -ForegroundColor Yellow
     Write-Host "  - File not encrypted with this tool" -ForegroundColor Yellow
-}
-
-if ($decryptedFiles.Count -gt 0) {
-    Write-Host ""
-    Write-Host "Location: $(Split-Path $decryptedFiles[0] -Parent)" -ForegroundColor Gray
 }

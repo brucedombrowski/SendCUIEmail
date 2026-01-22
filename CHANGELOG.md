@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.5.3] - 2026-01-21
+
+### Changed
+- **Password Entry UX** - Added hint "(Characters will not appear as you type)" before each password prompt
+- **Output Location Display** - Output folder now shown prominently at top of file list with full paths
+  - Yellow "Output folder:" label draws attention
+  - All encrypted/decrypted files shown with full absolute paths
+  - Easier for users to locate their files
+
+### Documentation
+- DM-2026-006: Beta readiness assessment with implementation plan
+
 ## [0.5.2] - 2026-01-21
 
 ### Added
