@@ -207,6 +207,40 @@ Subject: CUI - Encrypted Files - See README for Decryption Instructions
 
 Body:
 --------------------------------------------------------------------------------
+********************************************************************************
+*                    SENDER INSTRUCTIONS - DELETE BEFORE SENDING               *
+********************************************************************************
+
+BEFORE YOU SEND THIS EMAIL:
+
+1. ADD RECIPIENT
+   - Enter the recipient's email address in the "To:" field
+   - Verify they are authorized to receive CUI
+
+2. SIGN AND ENCRYPT (if you have PIV/CAC)
+   - Click "Sign" to prove this email came from you
+   - Click "Encrypt" if you have the recipient's S/MIME certificate
+   - S/MIME encryption adds transport protection on top of file encryption
+
+3. REVIEW ATTACHMENTS
+   - Verify the correct .Locked files are attached
+   - Verify README.md is attached
+   - Remove any files that should not be sent
+
+4. TEST DECRYPTION (recommended for first-time use)
+   - Before sending, decrypt one file yourself using the README instructions
+   - Confirms the password works and files are intact
+
+5. PLAN PASSWORD DELIVERY
+   - You must send the password via a SEPARATE channel
+   - COMPLIANT: Phone call, SMS text, in-person, S/MIME encrypted email
+   - NOT COMPLIANT: Unencrypted email (even if separate)
+
+DELETE THIS ENTIRE SECTION BEFORE SENDING as acknowledgement that you have
+reviewed these instructions.
+
+********************************************************************************
+
 CONTROLLED UNCLASSIFIED INFORMATION (CUI)
 ================================================================================
 
@@ -252,23 +286,33 @@ Subject: RE: Encrypted Files - Additional Information
 
 Body:
 --------------------------------------------------------------------------------
-SECURITY NOTICE - READ BEFORE SENDING
-================================================================================
+********************************************************************************
+*                    SENDER INSTRUCTIONS - DELETE BEFORE SENDING               *
+********************************************************************************
 
-COMPLIANT OPTIONS FOR PASSWORD DELIVERY:
+CHOOSE ONE DELIVERY METHOD:
 
-1. PHONE/SMS/IN-PERSON (Recommended)
-   Share this password via separate channel - do not send this email.
+OPTION A: DO NOT SEND THIS EMAIL (Recommended)
+   - Call the recipient and read them the password below
+   - Or send via SMS text message
+   - Or deliver in person
+   - Then DELETE this .msg file
 
-2. S/MIME SIGN AND ENCRYPT THIS EMAIL (If both parties have PIV/CAC)
-   Click "Sign" and "Encrypt" in Outlook before sending.
-   - Encrypts with recipient's public certificate (only they can read it)
-   - Signs with your private key (proves it came from you)
+OPTION B: S/MIME ENCRYPT THIS EMAIL (If recipient has PIV/CAC)
+   - This email is PRE-CONFIGURED to encrypt (requires recipient's certificate)
+   - Enter recipient's email in "To:" field
+   - Click "Sign" (proves it came from you)
+   - Verify "Encrypt" is enabled (should be on by default)
+   - Then send this email
 
-3. UNENCRYPTED EMAIL - NOT COMPLIANT per NIST SP 800-63B
-   Sending this email unencrypted does not meet out-of-band requirements.
+OPTION C: UNENCRYPTED EMAIL - NOT COMPLIANT
+   Sending this email unencrypted violates NIST SP 800-63B out-of-band
+   requirements, even if sent separately from the encrypted files.
 
-================================================================================
+DELETE THIS INSTRUCTION SECTION BEFORE SENDING as acknowledgement that you
+understand the compliance requirements.
+
+********************************************************************************
 
 DECRYPTION PASSWORD:
 
@@ -277,8 +321,8 @@ DECRYPTION PASSWORD:
 ================================================================================
 
 AFTER DELIVERY:
-- Delete this email from your Sent folder
-- Confirm recipient received and successfully decrypted the files
+- Delete this email/file (contains plaintext password)
+- Confirm recipient successfully decrypted the files
 - Document password transmission per your security procedures
 
 ================================================================================

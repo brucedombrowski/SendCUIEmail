@@ -1,246 +1,130 @@
-# SendCUIEmail
+# CUI//SP-CTI//SP-EXPT - Encrypted Files - Decryption Instructions
 
-Encrypt files for secure email transmission when certificate exchange isn't possible. Designed for CUI (Controlled Unclassified Information) handling per NIST SP 800-171.
+> **CUI//SP-CTI//SP-EXPT (Controlled Technical Information, Export Controlled)**
+> This document contains CUI handling instructions. Protect accordingly.
 
-## Security Hierarchy
+## Why You Received Password-Encrypted Files
 
-| Rank | Method | When to Use |
-|------|--------|-------------|
-| 1 | **S/MIME (PIV/CAC to PIV/CAC)** | Both parties have smart cards. Use Outlook's native Sign+Encrypt. **Gold standard.** |
-| 2 | **SendCUIEmail + S/MIME password** | Recipient has PIV/CAC. S/MIME encrypt the password email. |
-| 3 | **SendCUIEmail + out-of-band password** | No PIV/CAC. Share password via phone/SMS/in-person. |
-| 4 | **SendCUIEmail + unencrypted email password** | **NOT COMPLIANT** - convenience only with warnings. |
+This email uses password-based encryption rather than certificate-based encryption (S/MIME) because one of the following applies:
 
-## When to Use This Tool
+- You do not have a PIV/CAC smart card with email encryption certificate
+- Your certificate was not accessible to the sender (different organization, no directory access)
+- Your email client does not support S/MIME decryption
+- This is one-time or infrequent communication where certificate exchange was not practical
 
-**Use native S/MIME (don't need SendCUIEmail) when:**
-- Both parties have PIV/CAC with valid certificates
-- Recipient's certificate is accessible
-- Regular communication with same recipients
+When both parties have PIV/CAC, native S/MIME (Outlook Sign+Encrypt) is preferred. This tool uses AES-256 encryption via Windows CNG (Cryptography Next Generation), which is FIPS 140-2 validated when Windows FIPS mode is enabled (see [CMVP Certificate #4515](https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4515)).
 
-**Use SendCUIEmail when:**
-- Recipient does not have PIV/CAC card
-- Recipient's certificate is not accessible (different organization)
-- One-time or infrequent communication with external parties
-- Recipient's email client does not support S/MIME
-- Files need to be forwarded/stored on non-S/MIME systems
+## Receiving the Password
 
-See [Decisions/DM-2026-003_password_transmission.pdf](Decisions/DM-2026-003_password_transmission.pdf) for full guidance.
+**You will receive the password via a separate channel.** Per NIST SP 800-63B, passwords for encrypted files should be transmitted out-of-band (not in the same email as the encrypted files).
 
-## Features
+**Approved channels:**
+| Method | Why It's Approved |
+|--------|-------------------|
+| Phone call (PSTN landline) | Proves possession of phone number |
+| SMS text message | Proves possession of device/SIM |
+| In-person | Direct verification |
+| S/MIME encrypted email | Password protected by asymmetric encryption |
 
-- **FIPS 140-2 Compliant**: AES-256-CBC encryption with PBKDF2-HMAC-SHA256 key derivation
-- **CUI Marking Support**: Built-in CUI category selection per 32 CFR Part 2002
-- **No Dependencies**: Uses only built-in Windows PowerShell cryptography
-- **Email Ready**: Generates Outlook .msg draft with proper CUI banners and attachments
-- **Recipient Friendly**: Recipients decrypt with a single PowerShell command (no executables)
+**Not approved:** Unencrypted email (even if sent separately) does not meet out-of-band requirements.
 
-## Quick Start
+**References:**
+- [NIST SP 800-63B §5.1.3](https://pages.nist.gov/800-63-3/sp800-63b.html#-513-out-of-band-devices) - Out-of-band authenticator requirements
+- [NIST SP 800-171 §3.13.8](https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final) - CUI transmission protection
+- [32 CFR Part 2002](https://www.ecfr.gov/current/title-32/subtitle-B/chapter-XX/part-2002) - CUI handling requirements
 
-### Encrypt Files
+## Encrypted Files
 
-1. Drag files or folders onto `Encrypt.bat`
-2. Select CUI category
-3. Enter password (twice to confirm)
-4. Send the generated files to recipient
+- `AGENTS.md.Locked`
 
-**Output:**
-- `*.Locked` - Encrypted files
-- `README.md` - Decryption instructions for recipient
-- `CUI_Email_*.msg` - Outlook draft with encrypted files (if Outlook installed)
-- `Password_Email_*.msg` - Outlook draft with password (send separately or use alternate channel)
+## How to Decrypt (Windows PowerShell)
 
-### Decrypt Files
+### Option 1: One-Liner (Copy & Paste)
 
-Recipients paste this PowerShell one-liner (from the README.md you send them):
+Open **PowerShell** (Start Menu → type "PowerShell" → Enter), then paste this command:
 
 ```powershell
 $f=Read-Host "File";$p=Read-Host "Password" -AsSecureString;$d=[IO.File]::ReadAllBytes($f);$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($p)),$d[0..15],100000,"SHA256");$a=[Security.Cryptography.Aes]::Create();$a.Key=$k.GetBytes(32);$a.IV=$d[16..31];$c=$a.CreateDecryptor().TransformFinalBlock($d,32,$d.Length-32);[IO.File]::WriteAllBytes($f-replace'\.Locked$','',$c);Write-Host "Decrypted:"($f-replace'\.Locked$','')
 ```
 
-Or use `Decrypt.bat` if they have the tool.
+When prompted:
+1. Enter the full path to the .Locked file (e.g., `C:\Downloads\Document.pdf.Locked`)
+2. Enter the password
 
-## Files
+### Option 2: Step-by-Step Script
 
-| File | Purpose |
-|------|---------|
-| `Encrypt.bat` | Drag-and-drop encryption launcher |
-| `Encrypt.ps1` | Main encryption script |
-| `Decrypt.bat` | Drag-and-drop decryption launcher |
-| `Decrypt.ps1` | Decryption script |
-| `Test.bat` | Run round-trip verification tests |
-| `Test.ps1` | Test script |
+Save this as `Decrypt.ps1` and run it, or paste line-by-line:
 
-## What Gets Sent to Recipient
-
-**Email 1** (Encrypted Files):
-- `OriginalName.ext.Locked` - Encrypted file(s)
-- `README.md` - Decryption instructions
-
-**Email 2** (Password) - Send separately, or better yet, use alternate channel:
-- Password only (no attachments)
-
-**NOT sent:**
-- No `.exe` files
-- No `.ps1` scripts
-- No `.zip` bundles
-- No `.bat` files
-
-**Password Transmission Options (per NIST SP 800-63B):**
-
-| Method | Compliant? | Notes |
-|--------|------------|-------|
-| Phone/SMS/in-person | Yes | True out-of-band channel |
-| S/MIME encrypted email | Yes | Encrypt password email with recipient's PIV/CAC certificate |
-| Unencrypted email | No | Even separate email is not compliant |
-
-**Hybrid Approach:** If recipient has PIV/CAC, S/MIME encrypt the password email (click "Encrypt" in Outlook). The password is then protected by asymmetric encryption - only the recipient can decrypt it.
-
-See [Decisions/DM-2026-003_password_transmission.pdf](Decisions/DM-2026-003_password_transmission.pdf) for full guidance.
-
-## File Size Limit
-
-**Maximum supported attachment size: 10 MB**
-
-Files larger than 10 MB should not be sent via encrypted email due to:
-- Email gateway size limits (typically 10-25 MB)
-- Base64 encoding overhead (~33% size increase)
-- Delivery reliability concerns
-- Mailbox quota limitations
-
-For larger files, use:
-- Secure file transfer services (SFTP, approved cloud storage)
-- FIPS 140-2 validated encrypted USB drives
-- DoD SAFE, MilSuite, or similar approved platforms
-
-See [Decisions/DM-2026-002_file_size_limit.pdf](Decisions/DM-2026-002_file_size_limit.pdf) for full rationale.
-
-## Security
-
-### Encryption Details
-
-| Parameter | Value |
-|-----------|-------|
-| Algorithm | AES-256-CBC |
-| Key Derivation | PBKDF2-HMAC-SHA256 |
-| Iterations | 100,000 |
-| Salt | 128-bit random |
-| IV | 128-bit random |
-
-### Compliance
-
-- **FIPS 140-2**: AES-256-CBC is a FIPS-approved algorithm
-- **NIST SP 800-132**: PBKDF2 key derivation meets NIST recommendations
-- **NIST SP 800-171**: CUI handling requirements
-- **32 CFR Part 2002**: CUI marking requirements
-
-### CUI Categories Supported
-
-1. `CUI` - Basic Controlled Unclassified Information
-2. `CUI//SP-CTI` - Controlled Technical Information
-3. `CUI//SP-EXPT` - Export Controlled
-4. `CUI//SP-PRVCY` - Privacy
-5. `CUI//SP-PROPIN` - Proprietary Business Information
-
-## Testing
-
-### Automated Tests
-
-Run the test suite to verify encryption/decryption:
-
-```bash
-# Windows
-.\Test.bat
-
-# macOS/Linux
-./test.sh
-```
-
-### Test Data Files
-
-Pre-built test files are in `testdata/`:
-
-| File | Size | Purpose |
-|------|------|---------|
-| `small_text.txt` | 138 B | Basic text file |
-| `empty.txt` | 0 B | Edge case: empty file |
-| `binary_sample.bin` | 1 KB | Binary with null bytes |
-| `medium_file.bin` | 1 MB | Medium binary file |
-| `large_file_10mb.bin` | 10 MB | Maximum size test |
-| `README.pdf` | ~175 KB | Generated from README.md |
-| `README.docx` | ~15 KB | Generated from README.md |
-| `README.png` | ~200 KB | First page of README as image |
-| `sample.xlsx` | ~5 KB | Excel spreadsheet format |
-
-Generate test files (if missing):
-```bash
-./testdata/generate_testdata.sh
-```
-
-### Sample LaTeX Document
-
-A LaTeX source document is in `examples/test_document.tex`. Compile to PDF:
-
-```bash
-cd examples
-pdflatex test_document.tex
-```
-
-## Requirements
-
-**Windows (Primary Target):**
-- Windows 10/11
-- PowerShell 5.1 or later (included with Windows)
-- Microsoft Outlook (optional, for .msg generation)
-
-**macOS/Linux (Development/Testing):**
-- PowerShell Core 7+: `brew install powershell` (macOS) or see [Microsoft docs](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
-- Outlook .msg generation not available (gracefully skipped)
-- Core encryption/decryption fully functional
-
-## Usage Examples
-
-### Single File
-```
-Encrypt.bat document.pdf
-```
-
-### Multiple Files
-```
-Encrypt.bat file1.pdf file2.docx file3.xlsx
-```
-
-### Entire Folder
-```
-Encrypt.bat "C:\Sensitive\Documents"
-```
-
-### Command Line (PowerShell)
 ```powershell
-powershell -ExecutionPolicy Bypass -File Encrypt.ps1 "document.pdf"
+# Decrypt a .Locked file
+# Usage: Change $filePath to your file, then run
+
+$filePath = "C:\Path\To\YourFile.ext.Locked"  # <-- CHANGE THIS
+
+# Prompt for password
+$securePassword = Read-Host "Enter decryption password" -AsSecureString
+$password = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
+)
+
+# Read encrypted file
+$data = [System.IO.File]::ReadAllBytes($filePath)
+
+# Extract salt (first 16 bytes) and IV (next 16 bytes)
+$salt = $data[0..15]
+$iv = $data[16..31]
+$ciphertext = $data[32..($data.Length - 1)]
+
+# Derive key using PBKDF2
+$keyDeriver = [System.Security.Cryptography.Rfc2898DeriveBytes]::new(
+    $password, $salt, 100000, "SHA256"
+)
+$key = $keyDeriver.GetBytes(32)
+
+# Decrypt using AES-256-CBC
+$aes = [System.Security.Cryptography.Aes]::Create()
+$aes.Mode = "CBC"
+$aes.Padding = "PKCS7"
+$aes.Key = $key
+$aes.IV = $iv
+
+$decryptor = $aes.CreateDecryptor()
+$plainBytes = $decryptor.TransformFinalBlock($ciphertext, 0, $ciphertext.Length)
+
+# Write decrypted file (removes .Locked extension)
+$outputPath = $filePath -replace '\.Locked$', ''
+[System.IO.File]::WriteAllBytes($outputPath, $plainBytes)
+
+Write-Host "Decrypted successfully: $outputPath" -ForegroundColor Green
+
+# Cleanup
+$aes.Dispose()
+$keyDeriver.Dispose()
 ```
+
+## Technical Details
+
+| Parameter | Value | Standard |
+|-----------|-------|----------|
+| Encryption | AES-256-CBC | FIPS 197, FIPS 140-2 |
+| Key Derivation | PBKDF2-HMAC-SHA256 | NIST SP 800-132 |
+| Iterations | 100,000 | NIST SP 800-132 minimum: 10,000 |
+| Salt | 128-bit random (unique per file) | NIST SP 800-132 |
+| IV | 128-bit random (unique per file) | NIST SP 800-38A |
+
+**File Format**: Each `.Locked` file contains: Salt (16 bytes) + IV (16 bytes) + Ciphertext
+
+**Security Note**: Salt and IV are cryptographically random and unique for each encrypted file. They are automatically extracted from the file during decryption---you only need the password.
+
+**Compliance**: This encryption uses algorithms approved under FIPS 197 (AES) and NIST SP 800-132 (PBKDF2). For full NIST SP 800-171 §3.13.11 compliance, ensure Windows FIPS mode is enabled on systems handling CUI.
 
 ## Troubleshooting
 
-### "Script cannot be loaded" error
-Run via the .bat file, or set execution policy:
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-```
+- **"Access denied"**: Run PowerShell as Administrator, or save file to Desktop first
+- **"Path not found"**: Use full path with drive letter (e.g., `C:\Users\...`)
+- **Garbled output**: Wrong password - try again
+- **Script won't run**: Execution policy - use the one-liner instead, or run:
+  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
 
-### Outlook .msg not generated
-This is optional - Outlook must be installed. You can manually attach files to email.
-
-### Decryption fails
-- Verify password is correct
-- Ensure file wasn't corrupted during transfer
-- Check file has `.Locked` extension
-
-## License
-
-MIT License - See [LICENSE](LICENSE) file.
-
-## Related Projects
-
-- [PDFSigner](https://github.com/brucedombrowski/PDFSigner) - Digital signature tool for PDFs
-- [LaTeX](https://github.com/brucedombrowski/LaTeX) - LaTeX templates for decision memos and documentation
+---
+*Encrypted with SendCUIEmail - 2026-01-22 06:27*

@@ -14,6 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.7.0] - 2026-01-22
+
+### Added
+- **Sender Instructions in Email Drafts** - On-the-spot training to prevent leakage
+  - CUI_Email: 5-step checklist before sending (add recipient, sign/encrypt, review attachments, test decryption, plan password delivery)
+  - Password_Email: Clear delivery options (phone/SMS, S/MIME encrypt, or non-compliant warning)
+  - Instructions must be deleted before sending as acknowledgement
+- **Password Email Pre-Configured for Encryption** - S/MIME encryption enabled by default
+  - Sets PR_SECURITY_FLAGS via MAPI to enable encryption automatically
+  - Email body shows `[ENCRYPTION PRE-ENABLED]` or `[ENCRYPTION NOT PRE-SET]` status
+  - Guides sender based on whether encryption was successfully configured
+- **Organization Configuration Variables** - Customize for your organization when forking
+  - `$ORG_NAME` - Organization name for branding
+  - `$ORG_SUPPORT_CONTACT` - Support contact info for recipients
+  - `$ORG_HANDLING_INSTRUCTIONS` - Additional handling requirements
+  - `$MIN_PASSWORD_LENGTH` - Minimum password length (default 8)
+  - `$DEFAULT_CUI_CATEGORY` - Default CUI category selection
+
 ## [0.6.1] - 2026-01-22
 
 ### Fixed

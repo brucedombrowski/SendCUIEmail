@@ -32,7 +32,30 @@ param(
     [string[]]$Path
 )
 
-# Configuration - FIPS 140-2 / NIST SP 800-132 compliant
+# ============================================================================
+# ORGANIZATION CONFIGURATION - Customize these for your organization
+# ============================================================================
+# These settings can be modified when forking for your organization.
+# All other code should remain unchanged for compliance verification.
+
+$ORG_NAME = ""                    # Your organization name (leave empty for generic)
+                                  # Example: "ACME Corporation"
+
+$ORG_SUPPORT_CONTACT = ""         # Support contact for recipients having trouble
+                                  # Example: "IT Security: security@acme.com or x1234"
+
+$ORG_HANDLING_INSTRUCTIONS = ""   # Additional handling instructions (appended to emails)
+                                  # Example: "Per ACME Policy 12.3, retain for 7 years."
+
+$MIN_PASSWORD_LENGTH = 8          # Minimum password length (8 is NIST minimum)
+                                  # Increase if your organization requires longer
+
+$DEFAULT_CUI_CATEGORY = 0         # Default CUI category when user presses Enter
+                                  # 0 = Basic CUI, 1 = CTI, 2 = EXPT, 3 = PRVCY, 4 = PROPIN
+
+# ============================================================================
+# CRYPTOGRAPHIC CONFIGURATION - Do not modify (FIPS 140-2 / NIST SP 800-132)
+# ============================================================================
 $ITERATIONS = 100000  # PBKDF2 iterations (NIST SP 800-132 recommends minimum 10,000)
 $SALT_SIZE = 16       # bytes (128 bits)
 $KEY_SIZE = 32        # bytes (256 bits for AES-256)
@@ -217,7 +240,7 @@ function Get-SecurePassword {
     param([int]$MaxAttempts = 3)
 
     Write-Host "Password Options:" -ForegroundColor Yellow
-    Write-Host "  - Enter your own password (minimum 8 characters)" -ForegroundColor Gray
+    Write-Host "  - Enter your own password (minimum $MIN_PASSWORD_LENGTH characters)" -ForegroundColor Gray
     Write-Host "  - Press Enter for auto-generated passphrase (recommended)" -ForegroundColor Gray
     Write-Host "  - Will be transmitted out-of-band (phone, SMS, in-person)" -ForegroundColor Gray
     Write-Host ""
@@ -269,8 +292,8 @@ function Get-SecurePassword {
             continue
         }
 
-        if ($plain1.Length -lt 8) {
-            Write-Host "ERROR: Password must be at least 8 characters!" -ForegroundColor Red
+        if ($plain1.Length -lt $MIN_PASSWORD_LENGTH) {
+            Write-Host "ERROR: Password must be at least $MIN_PASSWORD_LENGTH characters!" -ForegroundColor Red
             if ($attempt -lt $MaxAttempts) {
                 Write-Host "Please try again." -ForegroundColor Yellow
             }
@@ -561,11 +584,56 @@ function Generate-OutlookEmail {
             "  - $(Split-Path $_ -Leaf)"
         }) -join "`r`n"
 
+        # Build optional organization sections
+        $orgHandling = ""
+        if (-not [string]::IsNullOrEmpty($ORG_HANDLING_INSTRUCTIONS)) {
+            $orgHandling = "`r`n$ORG_HANDLING_INSTRUCTIONS"
+        }
+
+        $orgSupport = ""
+        if (-not [string]::IsNullOrEmpty($ORG_SUPPORT_CONTACT)) {
+            $orgSupport = "`r`nQUESTIONS: $ORG_SUPPORT_CONTACT`r`n"
+        }
+
         # CUI-compliant subject line
         $mail.Subject = "$($CUICategory.Short) - Encrypted Files - See README for Decryption Instructions"
 
-        # CUI-compliant body with banner markings
+        # CUI-compliant body with sender instructions and banner markings
         $mail.Body = @"
+********************************************************************************
+*                    SENDER INSTRUCTIONS - DELETE BEFORE SENDING               *
+********************************************************************************
+
+BEFORE YOU SEND THIS EMAIL:
+
+1. ADD RECIPIENT
+   - Enter the recipient's email address in the "To:" field
+   - Verify they are authorized to receive CUI
+
+2. SIGN AND ENCRYPT (if you have PIV/CAC)
+   - Click "Sign" to prove this email came from you
+   - Click "Encrypt" if you have the recipient's S/MIME certificate
+   - S/MIME encryption adds transport protection on top of file encryption
+
+3. REVIEW ATTACHMENTS
+   - Verify the correct .Locked files are attached
+   - Verify README.md is attached
+   - Remove any files that should not be sent
+
+4. TEST DECRYPTION (recommended for first-time use)
+   - Before sending, decrypt one file yourself using the README instructions
+   - Confirms the password works and files are intact
+
+5. PLAN PASSWORD DELIVERY
+   - You must send the password via a SEPARATE channel
+   - COMPLIANT: Phone call, SMS text, in-person, S/MIME encrypted email
+   - NOT COMPLIANT: Unencrypted email (even if separate)
+
+DELETE THIS ENTIRE SECTION BEFORE SENDING as acknowledgement that you have
+reviewed these instructions.
+
+********************************************************************************
+
 $($CUICategory.Full)
 ================================================================================
 
@@ -585,8 +653,8 @@ HANDLING REQUIREMENTS:
 - This information is CUI and must be protected accordingly
 - Do not forward without authorization
 - Store on approved systems only
-- Destroy when no longer needed per retention requirements
-
+- Destroy when no longer needed per retention requirements$orgHandling
+$orgSupport
 ================================================================================
 $($CUICategory.Full)
 "@
@@ -651,25 +719,72 @@ function Generate-PasswordEmail {
         # Subject line - intentionally vague for security
         $mail.Subject = "RE: Encrypted Files - Additional Information"
 
+        # Build optional organization support section
+        $pwdOrgSupport = ""
+        if (-not [string]::IsNullOrEmpty($ORG_SUPPORT_CONTACT)) {
+            $pwdOrgSupport = "`r`nQUESTIONS: $ORG_SUPPORT_CONTACT`r`n"
+        }
+
+        # Try to set S/MIME encryption flag by default
+        # PR_SECURITY_FLAGS: 1 = Encrypt, 2 = Sign, 3 = Both
+        $encryptionSet = $false
+        try {
+            $PR_SECURITY_FLAGS = "http://schemas.microsoft.com/mapi/proptag/0x6E010003"
+            $mail.PropertyAccessor.SetProperty($PR_SECURITY_FLAGS, 1)  # 1 = Encrypt
+            $encryptionSet = $true
+        }
+        catch {
+            # If setting encryption fails (e.g., no certificate), continue without it
+            $encryptionSet = $false
+        }
+
+        # Build Option B text based on whether encryption was pre-set
+        if ($encryptionSet) {
+            $optionBText = @"
+OPTION B: S/MIME ENCRYPT THIS EMAIL (If recipient has PIV/CAC)
+   [ENCRYPTION PRE-ENABLED] This email is configured to encrypt automatically.
+   - Enter recipient's email in "To:" field
+   - Click "Sign" (proves it came from you)
+   - Verify the lock icon appears (encryption active)
+   - If encryption fails, you need the recipient's S/MIME certificate
+   - Then send this email
+"@
+        }
+        else {
+            $optionBText = @"
+OPTION B: S/MIME ENCRYPT THIS EMAIL (If recipient has PIV/CAC)
+   [ENCRYPTION NOT PRE-SET] You must manually enable encryption.
+   - Enter recipient's email in "To:" field
+   - Click "Sign" (proves it came from you)
+   - Click "Encrypt" (requires recipient's S/MIME certificate)
+   - Then send this email
+"@
+        }
+
         # Body with password and security warning
         $mail.Body = @"
-SECURITY NOTICE - READ BEFORE SENDING
-================================================================================
+********************************************************************************
+*                    SENDER INSTRUCTIONS - DELETE BEFORE SENDING               *
+********************************************************************************
 
-COMPLIANT OPTIONS FOR PASSWORD DELIVERY:
+CHOOSE ONE DELIVERY METHOD:
 
-1. PHONE/SMS/IN-PERSON (Recommended)
-   Share this password via separate channel - do not send this email.
+OPTION A: DO NOT SEND THIS EMAIL (Recommended)
+   - Call the recipient and read them the password below
+   - Or send via SMS text message
+   - Or deliver in person
+   - Then DELETE this .msg file
 
-2. S/MIME SIGN AND ENCRYPT THIS EMAIL (If both parties have PIV/CAC)
-   Click "Sign" and "Encrypt" in Outlook before sending.
-   - Encrypts with recipient's public certificate (only they can read it)
-   - Signs with your private key (proves it came from you)
+$optionBText
 
-3. UNENCRYPTED EMAIL - NOT COMPLIANT per NIST SP 800-63B
-   Sending this email unencrypted does not meet out-of-band requirements.
+OPTION C: UNENCRYPTED EMAIL - NOT COMPLIANT
+   Sending this email unencrypted violates NIST SP 800-63B out-of-band
+   requirements, even if sent separately from the encrypted files.
 
-================================================================================
+DELETE THIS INSTRUCTION SECTION BEFORE SENDING as acknowledgement that you
+understand the compliance requirements.
+
+********************************************************************************
 
 DECRYPTION PASSWORD:
 
@@ -678,10 +793,10 @@ DECRYPTION PASSWORD:
 ================================================================================
 
 AFTER DELIVERY:
-- Delete this email from your Sent folder
-- Confirm recipient received and successfully decrypted the files
+- Delete this email/file (contains plaintext password)
+- Confirm recipient successfully decrypted the files
 - Document password transmission per your security procedures
-
+$pwdOrgSupport
 ================================================================================
 "@
 
