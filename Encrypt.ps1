@@ -458,7 +458,7 @@ Add-Type -AssemblyName System.Windows.Forms;`$o=New-Object System.Windows.Forms.
 
 1. **Open dialog** - Browse to and select the .Locked file
 2. **Password prompt** - Enter the password (characters won't appear)
-3. **Save dialog** - Choose where to save the decrypted file (defaults to same folder)
+3. **Save dialog** - Filename auto-fills (e.g., ``Document.pdf.Locked`` → ``Document.pdf``)
 
 ### Option 2: Manual Path Entry
 
