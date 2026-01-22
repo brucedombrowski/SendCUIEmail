@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Backlog
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.7.2] - 2026-01-22
+
+### Added
+- **Open_PowerShell.bat** - Helper for recipients to launch PowerShell
+  - Double-click to open PowerShell ready for decryption commands
+  - Shows helpful message pointing to README.md
+
 ## [0.7.1] - 2026-01-22
 
 ### Changed

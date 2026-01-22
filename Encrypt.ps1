@@ -446,9 +446,11 @@ $fileList
 
 ## How to Decrypt (Windows PowerShell)
 
+**Quick Start:** Press ``Win+X`` then click "Windows PowerShell" or "Terminal"
+
 ### Option 1: File Picker (Recommended - No Typing Paths)
 
-Open **PowerShell** (Start Menu → type "PowerShell" → Enter), then paste this command:
+Open PowerShell, then paste this command:
 
 ``````powershell
 Add-Type -AssemblyName System.Windows.Forms;`$o=New-Object System.Windows.Forms.OpenFileDialog;`$o.Title="Select .Locked file to decrypt";`$o.Filter="Locked files (*.Locked)|*.Locked|All files (*.*)|*.*";if(`$o.ShowDialog()-eq'OK'){`$f=`$o.FileName;`$p=Read-Host "Password" -AsSecureString;`$b=[IO.File]::ReadAllBytes(`$f);`$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$p)),`$b[0..15],100000,"SHA256");`$a=[Security.Cryptography.Aes]::Create();`$a.Key=`$k.GetBytes(32);`$a.IV=`$b[16..31];`$c=`$a.CreateDecryptor().TransformFinalBlock(`$b,32,`$b.Length-32);`$s=New-Object System.Windows.Forms.SaveFileDialog;`$s.Title="Save decrypted file as";`$s.FileName=[IO.Path]::GetFileName(`$f-replace'\.Locked`$','');`$s.InitialDirectory=[IO.Path]::GetDirectoryName(`$f);if(`$s.ShowDialog()-eq'OK'){[IO.File]::WriteAllBytes(`$s.FileName,`$c);Write-Host "Decrypted: `$(`$s.FileName)" -ForegroundColor Green}}
