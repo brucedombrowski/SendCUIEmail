@@ -61,6 +61,14 @@ $SALT_SIZE = 16       # bytes (128 bits)
 $KEY_SIZE = 32        # bytes (256 bits for AES-256)
 $IV_SIZE = 16         # bytes (128 bits for AES block size)
 
+# ============================================================================
+# DECRYPTION ONE-LINER - Single source of truth for README.md and Password_Email
+# ============================================================================
+# This PowerShell one-liner is included in both the README and Password_Email.
+# Uses file picker dialogs for ease of use. DO NOT MODIFY unless you understand
+# the cryptographic operations (must match Encrypt-File function).
+$DECRYPTION_ONELINER = 'Add-Type -AssemblyName System.Windows.Forms;$o=New-Object System.Windows.Forms.OpenFileDialog;$o.Title="Select .Locked file to decrypt";$o.Filter="Locked files (*.Locked)|*.Locked|All files (*.*)|*.*";if($o.ShowDialog()-eq''OK''){$f=$o.FileName;$p=Read-Host "Password" -AsSecureString;$b=[IO.File]::ReadAllBytes($f);$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($p)),$b[0..15],100000,"SHA256");$a=[Security.Cryptography.Aes]::Create();$a.Key=$k.GetBytes(32);$a.IV=$b[16..31];$c=$a.CreateDecryptor().TransformFinalBlock($b,32,$b.Length-32);$s=New-Object System.Windows.Forms.SaveFileDialog;$s.Title="Save decrypted file as";$s.FileName=[IO.Path]::GetFileName(($f-replace''\.Locked$'',''''));$s.InitialDirectory=[IO.Path]::GetDirectoryName($f);if($s.ShowDialog()-eq''OK''){[IO.File]::WriteAllBytes($s.FileName,$c);Write-Host "Decrypted: $($s.FileName)" -ForegroundColor Green}}'
+
 # Platform detection
 $IsWindowsPlatform = $PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows
 
@@ -453,7 +461,7 @@ $fileList
 Open PowerShell, then paste this command:
 
 ``````powershell
-Add-Type -AssemblyName System.Windows.Forms;`$o=New-Object System.Windows.Forms.OpenFileDialog;`$o.Title="Select .Locked file to decrypt";`$o.Filter="Locked files (*.Locked)|*.Locked|All files (*.*)|*.*";if(`$o.ShowDialog()-eq'OK'){`$f=`$o.FileName;`$p=Read-Host "Password" -AsSecureString;`$b=[IO.File]::ReadAllBytes(`$f);`$k=[Security.Cryptography.Rfc2898DeriveBytes]::new([Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$p)),`$b[0..15],100000,"SHA256");`$a=[Security.Cryptography.Aes]::Create();`$a.Key=`$k.GetBytes(32);`$a.IV=`$b[16..31];`$c=`$a.CreateDecryptor().TransformFinalBlock(`$b,32,`$b.Length-32);`$s=New-Object System.Windows.Forms.SaveFileDialog;`$s.Title="Save decrypted file as";`$s.FileName=[IO.Path]::GetFileName((`$f-replace'\.Locked`$',''));`$s.InitialDirectory=[IO.Path]::GetDirectoryName(`$f);if(`$s.ShowDialog()-eq'OK'){[IO.File]::WriteAllBytes(`$s.FileName,`$c);Write-Host "Decrypted: `$(`$s.FileName)" -ForegroundColor Green}}
+$($DECRYPTION_ONELINER -replace '\$', '`$')
 ``````
 
 1. **Open dialog** - Browse to and select the .Locked file
@@ -797,6 +805,12 @@ DELETE THIS INSTRUCTION SECTION BEFORE SENDING as acknowledgement that you
 understand the compliance requirements.
 
 ********************************************************************************
+
+DECRYPTION COMMAND (paste into PowerShell):
+
+$DECRYPTION_ONELINER
+
+================================================================================
 
 DECRYPTION PASSWORD:
 
