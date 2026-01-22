@@ -683,25 +683,31 @@ $($CUICategory.Full)
 This email contains Controlled Unclassified Information (CUI) that requires
 safeguarding per 32 CFR Part 2002.
 
+DIGITAL SIGNATURE REQUEST:
+If you have a PIV/CAC card or other email signing capability, please reply to
+this email with a digitally signed message to confirm receipt. This helps
+establish trust and supports compliance verification.
+
 ENCRYPTED FILES ATTACHED:
 $fileListText
   - Decrypt_Instructions.html (Decryption Instructions)
 
 DECRYPTION:
 The attached files are encrypted using AES-256 (FIPS 140-2 compliant).
-Please open Decrypt_Instructions.html in your browser for step-by-step decryption instructions.
-You will need the password, which will be provided via separate communication.
+Open Decrypt_Instructions.html for step-by-step instructions.
+Password will be provided separately.
+
+IF HTML IS INACCESSIBLE - use these steps in Windows PowerShell:
+  1. Save the .Locked file(s) to your computer
+  2. Run this command (opens file picker dialogs):
+
+$DECRYPTION_ONELINER
 
 HANDLING REQUIREMENTS:
 - This information is CUI and must be protected accordingly
 - Do not forward without authorization
 - Store on approved systems only
 - Destroy when no longer needed per retention requirements$orgHandling
-
-DIGITAL SIGNATURE REQUEST:
-If you have a PIV/CAC card or other email signing capability, please reply to
-this email with a digitally signed message to confirm receipt. This helps
-establish trust and supports compliance verification.
 $orgSupport
 ================================================================================
 $($CUICategory.Full)

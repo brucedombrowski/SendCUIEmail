@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.12.0] - 2026-01-22
+
+### Changed
+- **Email Body Improvements** - Better recipient experience
+  - Digital Signature Request moved to top of email body
+  - Fallback decryption instructions if HTML inaccessible (save file, run command)
+  - PowerShell one-liner embedded directly in email body
+
 ## [0.11.0] - 2026-01-22
 
 ### Added
