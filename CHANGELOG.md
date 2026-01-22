@@ -10,6 +10,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Request for signed email reply feature (draft email requesting recipient's digital signature)
 
+## [0.5.2] - 2026-01-21
+
+### Added
+- Cleanup reminder in console output warning users to delete .msg files after sending
+- Password_Email warning highlighted in red (contains plaintext password)
+
+## [0.5.1] - 2026-01-21
+
+### Changed
+- Password requirements now shown upfront before first prompt (not just after validation failure)
+- Password transmission guidance now shows explicit compliance status:
+  - `[COMPLIANT]` Phone call, SMS, in-person, S/MIME encrypted email
+  - `[NOT COMPLIANT]` Unencrypted email - even if separate
+
+## [0.5.0] - 2026-01-21
+
+### Added
+- **Multiple CUI Subcategory Selection** per 32 CFR Part 2002.20(a)(3)
+  - Users can now select multiple subcategories (e.g., "1,2" for CTI+EXPT)
+  - Generates proper compound markings like `CUI//SP-CTI//SP-EXPT`
+  - Option 0 or empty input defaults to basic `CUI`
+
+### Documentation
+- DM-2026-005: Multiple CUI subcategory selection support decision memo
+
+## [0.4.0] - 2026-01-21
+
+### Added
+- **Shell Wrapper Scripts** for macOS/Linux convenience
+  - `Encrypt.sh` - Calls Encrypt.ps1 via pwsh
+  - `Decrypt.sh` - Calls Decrypt.ps1 via pwsh
+  - Both scripts encrypt/decrypt all files in directory when called with no arguments
+  - Automatic filtering of scripts, .Locked files, and README from encryption
+
+## [0.3.0] - 2026-01-21
+
+### Documentation
+- DM-2026-004: VER document numbering policy (stable IDs across releases)
+
 ## [0.2.0] - 2026-01-21
 
 ### Added
