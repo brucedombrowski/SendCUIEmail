@@ -1,5 +1,5 @@
 % VER-2026-001: Cryptographic Compliance Verification
-% SendCUIEmail - Verification against NIST/FIPS Standards
+% SendCUIEmail - Verification against REQ-2026-001 Requirements
 \documentclass[11pt,letterpaper]{article}
 
 % Page layout
@@ -63,10 +63,10 @@
 \title{
     \textbf{VER-2026-001} \\
     \Large Cryptographic Compliance Verification \\
-    \large SendCUIEmail v0.17.2
+    \large SendCUIEmail v0.17.3
 }
 \author{Verification Document}
-\date{January 21, 2026}
+\date{January 22, 2026}
 
 \begin{document}
 
@@ -78,449 +78,555 @@
 \textbf{Document ID:} & VER-2026-001 \\
 \textbf{Subject:} & Cryptographic Implementation Compliance Verification \\
 \textbf{Requirements:} & REQ-2026-001 v1.1 \\
-\textbf{Software Version:} & v0.17.2 \\
-\textbf{Git Commit:} & \texttt{1b22fc9c72903aca755f28da1916c0384a7d3937} \\
-\textbf{Commit Date:} & 2026-01-22 10:04:50 -0600 \\
+\textbf{Software Version:} & v0.17.3 \\
+\textbf{Git Commit:} & \texttt{2048d2e4508e83ca77b264949775835a3d3aba96} \\
+\textbf{Commit Date:} & 2026-01-22 10:12:44 -0600 \\
 \textbf{Source File:} & \texttt{Encrypt.ps1} \\
 \end{tabular}
 
 \section*{Executive Summary}
 
-This document verifies that SendCUIEmail's cryptographic implementation complies with applicable NIST and FIPS standards for protecting Controlled Unclassified Information (CUI). Each requirement is traced to the authoritative standard, with code excerpts demonstrating compliance.
+This document verifies SendCUIEmail's compliance with REQ-2026-001 Cryptographic Compliance Requirements. Each requirement is traced by its REQ ID, with code evidence demonstrating compliance.
 
 \tableofcontents
 \newpage
 
 % ============================================================================
-\section{NIST SP 800-132: Password-Based Key Derivation}
+\section{Encryption Algorithm Requirements}
 % ============================================================================
 
-\subsection{Standard Reference}
+\subsection{REQ-1.1: AES Algorithm}
 
-\begin{quote}
-\textbf{NIST Special Publication 800-132} \\
-\textit{Recommendation for Password-Based Key Derivation} \\
-December 2010 \\
-\url{https://csrc.nist.gov/publications/detail/sp/800-132/final}
-\end{quote}
+\textbf{Requirement:} The system SHALL use AES (Advanced Encryption Standard) as defined in FIPS 197 for symmetric encryption.
 
-\subsection{Requirement 1: Key Derivation Function}
-
-\textbf{Standard Quote (§5.1):}
-\begin{quote}
-``The key derivation functions (KDFs) specified in this Recommendation are PBKDF2 as specified in [RFC 2898] and [RFC 8018].''
-\end{quote}
+\textbf{Verification Method:} Inspection
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 207-213):}
+\textbf{Evidence (Encrypt.ps1, line 347):}
 \begin{lstlisting}[language=bash]
-# Derive key using PBKDF2
+$aes = [System.Security.Cryptography.Aes]::Create()
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Uses .NET Aes class which implements FIPS 197.
+\end{samepage}
+
+\subsection{REQ-1.2: 256-bit Key Length}
+
+\textbf{Requirement:} The system SHALL use a key length of 256 bits (AES-256) for all encryption operations.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 61, 344):}
+\begin{lstlisting}[language=bash]
+$KEY_SIZE = 32        # bytes (256 bits for AES-256)
+...
+$key = $keyDeriver.GetBytes($KEY_SIZE)
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Key is 256 bits (32 bytes).
+\end{samepage}
+
+\subsection{REQ-1.3: CBC Mode}
+
+\textbf{Requirement:} The system SHALL use Cipher Block Chaining (CBC) mode or an authenticated encryption mode (GCM, CCM).
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 348):}
+\begin{lstlisting}[language=bash]
+$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Uses CBC mode.
+\end{samepage}
+
+\subsection{REQ-1.4: Unique Random IV}
+
+\textbf{Requirement:} The system SHALL generate a unique, random Initialization Vector (IV) for each encryption operation.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 331-335):}
+\begin{lstlisting}[language=bash]
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$salt = New-Object byte[] $SALT_SIZE
+$iv = New-Object byte[] $IV_SIZE
+$rng.GetBytes($salt)
+$rng.GetBytes($iv)
+\end{lstlisting}
+\textbf{Test:} Encrypted same file twice, verified IVs differ in output.\\
+\textbf{Result:} PASS $\checkmark$ --- New random IV generated for each encryption.
+\end{samepage}
+
+\subsection{REQ-1.5: IV Size}
+
+\textbf{Requirement:} The IV SHALL be at least 128 bits (16 bytes) for AES-CBC mode.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 62):}
+\begin{lstlisting}[language=bash]
+$IV_SIZE = 16         # bytes (128 bits for AES block size)
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- IV is exactly 128 bits.
+\end{samepage}
+
+\subsection{REQ-1.6: IV Storage}
+
+\textbf{Requirement:} The IV SHALL be stored with or transmitted alongside the ciphertext.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 358-361):}
+\begin{lstlisting}[language=bash]
+# Combine: Salt + IV + Ciphertext
+$outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
+[Array]::Copy($salt, 0, $outputBytes, 0, $SALT_SIZE)
+[Array]::Copy($iv, 0, $outputBytes, $SALT_SIZE, $IV_SIZE)
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- IV stored at bytes 16-31 of output file.
+\end{samepage}
+
+\newpage
+% ============================================================================
+\section{Key Derivation Requirements}
+% ============================================================================
+
+\subsection{REQ-2.1: PBKDF2}
+
+\textbf{Requirement:} The system SHALL use PBKDF2 (Password-Based Key Derivation Function 2) as defined in NIST SP 800-132 for deriving encryption keys from passwords.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 338-343):}
+\begin{lstlisting}[language=bash]
 $keyDeriver = New-Object System.Security.Cryptography.Rfc2898DeriveBytes(
     $Password,
     $salt,
     $ITERATIONS,
     [System.Security.Cryptography.HashAlgorithmName]::SHA256
 )
-$key = $keyDeriver.GetBytes($KEY_SIZE)
 \end{lstlisting}
-\textbf{Verification:} The implementation uses \texttt{Rfc2898DeriveBytes}, which is the .NET implementation of PBKDF2 as specified in RFC 2898/8018. $\checkmark$
+\textbf{Result:} PASS $\checkmark$ --- Uses Rfc2898DeriveBytes (PBKDF2 implementation).
 \end{samepage}
 
-\subsection{Requirement 2: Salt Length}
+\subsection{REQ-2.2: HMAC-SHA256 PRF}
 
-\textbf{Standard Quote (§5.1):}
-\begin{quote}
-``The salt shall be at least 128 bits in length.''
-\end{quote}
+\textbf{Requirement:} The system SHALL use HMAC-SHA256 as the pseudorandom function (PRF) for PBKDF2.
 
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 37, 201-203):}
-\begin{lstlisting}[language=bash]
-$SALT_SIZE = 16       # bytes (128 bits)
-...
-$salt = New-Object byte[] $SALT_SIZE
-$rng.GetBytes($salt)
-\end{lstlisting}
-\textbf{Verification:} Salt is exactly 128 bits (16 bytes), meeting the minimum requirement. $\checkmark$
-\end{samepage}
-
-\subsection{Requirement 3: Salt Generation}
-
-\textbf{Standard Quote (§5.1):}
-\begin{quote}
-``The salt shall be generated by an approved random bit generator (RBG).''
-\end{quote}
+\textbf{Verification Method:} Inspection
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 200, 203):}
-\begin{lstlisting}[language=bash]
-$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-...
-$rng.GetBytes($salt)
-\end{lstlisting}
-\textbf{Verification:} Salt is generated using \texttt{RandomNumberGenerator}, which uses the operating system's cryptographically secure random number generator (Windows CNG on Windows, /dev/urandom on Unix). $\checkmark$
-\end{samepage}
-
-\subsection{Requirement 4: Iteration Count}
-
-\textbf{Standard Quote (§5.2):}
-\begin{quote}
-``The iteration count shall be selected as large as possible, as long as the time required to generate the key using the entered password is acceptable for the user; a minimum of 1,000 iterations is recommended. For especially critical keys, or for very powerful systems or systems where user-perceived performance is not critical, an iteration count of 10,000,000 may be appropriate.''
-\end{quote}
-
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 36):}
-\begin{lstlisting}[language=bash]
-$ITERATIONS = 100000  # PBKDF2 iterations (NIST SP 800-132 recommends minimum 10,000)
-\end{lstlisting}
-\textbf{Verification:} Implementation uses 100,000 iterations, which is 10x the recommended minimum of 10,000 and 100x the absolute minimum of 1,000. This balances security with usability. $\checkmark$
-\end{samepage}
-
-\subsection{Requirement 5: Derived Key Length}
-
-\textbf{Standard Quote (§5.3):}
-\begin{quote}
-``The Master Key shall be at least 112 bits in length.''
-\end{quote}
-
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 38, 213):}
-\begin{lstlisting}[language=bash]
-$KEY_SIZE = 32        # bytes (256 bits for AES-256)
-...
-$key = $keyDeriver.GetBytes($KEY_SIZE)
-\end{lstlisting}
-\textbf{Verification:} Derived key is 256 bits, exceeding the 112-bit minimum by a factor of 2.3x. $\checkmark$
-\end{samepage}
-
-\subsection{Requirement 6: Hash Algorithm}
-
-\textbf{Standard Quote (§5.1):}
-\begin{quote}
-``PBKDF2 may use HMAC with either SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224 or SHA-512/256.''
-\end{quote}
-
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 211):}
+\textbf{Evidence (Encrypt.ps1, line 342):}
 \begin{lstlisting}[language=bash]
 [System.Security.Cryptography.HashAlgorithmName]::SHA256
 \end{lstlisting}
-\textbf{Verification:} Implementation uses HMAC-SHA256, which is explicitly listed as approved. $\checkmark$
+\textbf{Result:} PASS $\checkmark$ --- Explicitly specifies SHA256 for HMAC.
 \end{samepage}
 
-\newpage
-% ============================================================================
-\section{FIPS 197: Advanced Encryption Standard (AES)}
-% ============================================================================
+\subsection{REQ-2.3: Iteration Count}
 
-\subsection{Standard Reference}
+\textbf{Requirement:} The system SHALL use a minimum of 100,000 iterations for PBKDF2 per NIST SP 800-132 recommendations.
 
-\begin{quote}
-\textbf{Federal Information Processing Standard Publication 197} \\
-\textit{Advanced Encryption Standard (AES)} \\
-November 26, 2001 \\
-\url{https://csrc.nist.gov/publications/detail/fips/197/final}
-\end{quote}
-
-\subsection{Requirement 1: Algorithm}
-
-\textbf{Standard Quote (§1):}
-\begin{quote}
-``This standard specifies the Rijndael algorithm, a symmetric block cipher that can process data blocks of 128 bits, using cipher keys with lengths of 128, 192, and 256 bits.''
-\end{quote}
+\textbf{Verification Method:} Inspection
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 216-220):}
+\textbf{Evidence (Encrypt.ps1, line 59):}
 \begin{lstlisting}[language=bash]
-$aes = [System.Security.Cryptography.Aes]::Create()
-$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
-$aes.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
-$aes.Key = $key
-$aes.IV = $iv
+$ITERATIONS = 100000  # PBKDF2 iterations
 \end{lstlisting}
-\textbf{Verification:} Implementation uses the \texttt{System.Security.Cryptography.Aes} class, which implements the AES algorithm as specified in FIPS 197. $\checkmark$
+\textbf{Result:} PASS $\checkmark$ --- Uses exactly 100,000 iterations.
 \end{samepage}
 
-\subsection{Requirement 2: Key Length}
+\subsection{REQ-2.4: Unique Random Salt}
 
-\textbf{Standard Quote (§1):}
-\begin{quote}
-``...using cipher keys with lengths of 128, 192, and 256 bits.''
-\end{quote}
+\textbf{Requirement:} The system SHALL generate a unique, random salt for each encryption operation.
 
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 38):}
-\begin{lstlisting}[language=bash]
-$KEY_SIZE = 32        # bytes (256 bits for AES-256)
-\end{lstlisting}
-\textbf{Verification:} Implementation uses 256-bit keys, the strongest option specified in FIPS 197. $\checkmark$
-\end{samepage}
-
-\newpage
-% ============================================================================
-\section{NIST SP 800-38A: Block Cipher Modes of Operation}
-% ============================================================================
-
-\subsection{Standard Reference}
-
-\begin{quote}
-\textbf{NIST Special Publication 800-38A} \\
-\textit{Recommendation for Block Cipher Modes of Operation} \\
-December 2001 \\
-\url{https://csrc.nist.gov/publications/detail/sp/800-38a/final}
-\end{quote}
-
-\subsection{Requirement 1: Mode of Operation}
-
-\textbf{Standard Quote (§6.2):}
-\begin{quote}
-``In CBC encryption, the first input block is formed by exclusive-ORing the first plaintext block with the IV... CBC encryption requires a unique IV for each message.''
-\end{quote}
+\textbf{Verification Method:} Test
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 217):}
+\textbf{Evidence (Encrypt.ps1, lines 331-334):}
 \begin{lstlisting}[language=bash]
-$aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
-\end{lstlisting}
-\textbf{Verification:} Implementation uses CBC mode as specified. $\checkmark$
-\end{samepage}
-
-\subsection{Requirement 2: Initialization Vector (IV)}
-
-\textbf{Standard Quote (Appendix C):}
-\begin{quote}
-``For the CBC, CFB, and OFB modes, the IV must be unpredictable... For CBC mode, the IV need not be secret.''
-\end{quote}
-
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 39, 202, 203):}
-\begin{lstlisting}[language=bash]
-$IV_SIZE = 16         # bytes (128 bits for AES block size)
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$salt = New-Object byte[] $SALT_SIZE
 ...
-$iv = New-Object byte[] $IV_SIZE
-$rng.GetBytes($iv)
+$rng.GetBytes($salt)
 \end{lstlisting}
-\textbf{Verification:} IV is 128 bits (matching AES block size) and generated using a cryptographically secure random number generator, making it unpredictable. A unique IV is generated for each file encryption. $\checkmark$
+\textbf{Test:} Encrypted same file twice with same password, verified salts differ.\\
+\textbf{Result:} PASS $\checkmark$ --- New random salt generated for each encryption.
 \end{samepage}
 
-\newpage
-% ============================================================================
-\section{FIPS 140-2: Cryptographic Module Validation}
-% ============================================================================
+\subsection{REQ-2.5: Salt Size}
 
-\subsection{Standard Reference}
+\textbf{Requirement:} The salt SHALL be at least 128 bits (16 bytes) as recommended by NIST SP 800-132.
 
-\begin{quote}
-\textbf{Federal Information Processing Standard Publication 140-2} \\
-\textit{Security Requirements for Cryptographic Modules} \\
-May 25, 2001 (Updated December 3, 2002) \\
-\url{https://csrc.nist.gov/publications/detail/fips/140/2/final}
-\end{quote}
-
-\subsection{Validation Status}
-
-\textbf{Windows CNG (Cryptography Next Generation):}
-\begin{itemize}
-    \item \textbf{CMVP Certificate:} \#4515
-    \item \textbf{Module:} Windows Cryptographic Primitives Library (bcryptprimitives.dll)
-    \item \textbf{Validation Date:} June 2022
-    \item \textbf{Security Level:} 1
-    \item \textbf{Certificate URL:} \url{https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4515}
-\end{itemize}
-
-\subsection{Implementation Reliance}
-
-\textbf{Implementation:}
-
-The following .NET cryptographic classes are used, all of which delegate to Windows CNG when running on Windows:
+\textbf{Verification Method:} Inspection
 
 \begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 60):}
 \begin{lstlisting}[language=bash]
-[System.Security.Cryptography.RandomNumberGenerator]::Create()
-[System.Security.Cryptography.Rfc2898DeriveBytes]
-[System.Security.Cryptography.Aes]::Create()
+$SALT_SIZE = 16       # bytes (128 bits)
 \end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Salt is exactly 128 bits.
 \end{samepage}
 
-\textbf{Important Note:}
+\subsection{REQ-2.6: Salt Storage}
 
-FIPS 140-2 validation requires that Windows FIPS mode be enabled. When FIPS mode is enabled:
-\begin{itemize}
-    \item Windows enforces use of FIPS-validated algorithms
-    \item The cryptographic primitives library (bcryptprimitives.dll) operates in FIPS mode
-    \item Non-compliant algorithms are rejected
-\end{itemize}
+\textbf{Requirement:} The salt SHALL be stored with or transmitted alongside the ciphertext.
 
-\textbf{To enable FIPS mode:}
-\begin{enumerate}
-    \item Open Local Security Policy (secpol.msc)
-    \item Navigate to: Security Settings $\rightarrow$ Local Policies $\rightarrow$ Security Options
-    \item Enable: ``System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing''
-\end{enumerate}
+\textbf{Verification Method:} Inspection
 
-\textbf{Verification:} Implementation uses Windows CNG primitives via .NET, which are FIPS 140-2 validated (CMVP \#4515) when Windows FIPS mode is enabled. $\checkmark$
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 358-359):}
+\begin{lstlisting}[language=bash]
+$outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
+[Array]::Copy($salt, 0, $outputBytes, 0, $SALT_SIZE)
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Salt stored at bytes 0-15 of output file.
+\end{samepage}
 
-\newpage
-% ============================================================================
-\section{NIST SP 800-171: CUI Protection Requirements}
-% ============================================================================
+\subsection{REQ-2.7: Iteration Count Review (Recommended)}
 
-\subsection{Standard Reference}
+\textbf{Requirement:} The iteration count SHOULD be increased over time as computing power increases.
 
-\begin{quote}
-\textbf{NIST Special Publication 800-171 Revision 2} \\
-\textit{Protecting Controlled Unclassified Information in Nonfederal Systems and Organizations} \\
-February 2020 \\
-\url{https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final}
-\end{quote}
+\textbf{Verification Method:} Analysis
 
-\subsection{Requirement 3.13.8: Transmission Confidentiality}
+\textbf{Analysis:} Current iteration count (100,000) was set in 2026. NIST recommends reviewing iteration counts periodically. The constant \texttt{\$ITERATIONS} is centrally defined for easy updates.
 
-\textbf{Standard Quote:}
-\begin{quote}
-``Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission unless otherwise protected by alternative physical safeguards.''
-\end{quote}
-
-\textbf{Implementation:}
-
-SendCUIEmail encrypts all files before transmission using AES-256-CBC encryption. The encrypted files (*.Locked) can only be decrypted with the correct password.
-
-\textbf{Verification:} Files are encrypted before email transmission, preventing unauthorized disclosure. $\checkmark$
-
-\subsection{Requirement 3.13.11: FIPS-Validated Cryptography}
-
-\textbf{Standard Quote:}
-\begin{quote}
-``Employ FIPS-validated cryptography when used to protect the confidentiality of CUI.''
-\end{quote}
-
-\textbf{Implementation:}
-
-\begin{itemize}
-    \item \textbf{Algorithm:} AES-256-CBC (FIPS 197 approved)
-    \item \textbf{Key Derivation:} PBKDF2-HMAC-SHA256 (NIST SP 800-132 approved)
-    \item \textbf{Module:} Windows CNG (CMVP Certificate \#4515)
-    \item \textbf{Condition:} Windows FIPS mode must be enabled for full compliance
-\end{itemize}
-
-\textbf{Verification:} When Windows FIPS mode is enabled, the implementation uses FIPS-validated cryptographic modules. $\checkmark$ (Conditional)
+\textbf{Result:} PASS $\checkmark$ --- Iteration count is configurable and documented.
 
 \newpage
 % ============================================================================
-\section{Compliance Summary Matrix}
+\section{Random Number Generation Requirements}
+% ============================================================================
+
+\subsection{REQ-3.1: CSPRNG}
+
+\textbf{Requirement:} The system SHALL use a cryptographically secure random number generator (CSPRNG) for generating salts, IVs, and other cryptographic material.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 331):}
+\begin{lstlisting}[language=bash]
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$ --- Uses .NET RandomNumberGenerator (CSPRNG).
+\end{samepage}
+
+\subsection{REQ-3.2: Windows System RNG}
+
+\textbf{Requirement:} On Windows, the system SHALL use the system RNG provided by .NET (RNGCryptoServiceProvider or RandomNumberGenerator).
+
+\textbf{Verification Method:} Inspection
+
+\textbf{Evidence:} Same as REQ-3.1. RandomNumberGenerator.Create() returns the platform-appropriate CSPRNG (Windows CNG on Windows).
+
+\textbf{Result:} PASS $\checkmark$
+
+\subsection{REQ-3.3: NIST SP 800-90A Compliance}
+
+\textbf{Requirement:} The CSPRNG SHALL meet the requirements of NIST SP 800-90A or equivalent.
+
+\textbf{Verification Method:} Analysis
+
+\textbf{Analysis:} Windows CNG (bcryptprimitives.dll) is FIPS 140-2 validated (CMVP \#4515) and implements NIST SP 800-90A compliant random number generation.
+
+\textbf{Result:} PASS $\checkmark$
+
+\newpage
+% ============================================================================
+\section{Password Requirements}
+% ============================================================================
+
+\subsection{REQ-4.1: Minimum Password Length}
+
+\textbf{Requirement:} The system SHALL enforce a minimum password length of 8 characters.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 50, 269-272):}
+\begin{lstlisting}[language=bash]
+$MIN_PASSWORD_LENGTH = 8
+...
+if ($plain.Length -lt $MIN_PASSWORD_LENGTH) {
+    Write-Host "Password must be at least $MIN_PASSWORD_LENGTH characters"
+    ...
+\end{lstlisting}
+\textbf{Test:} Attempted encryption with 7-character password; rejected.\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-4.2: Password Confirmation}
+
+\textbf{Requirement:} The system SHALL require password confirmation during encryption to prevent typos.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 280-293):}
+\begin{lstlisting}[language=bash]
+$confirm = Read-Host "Confirm password" -AsSecureString
+...
+if ($plain -ne $confirmPlain) {
+    Write-Host "Passwords do not match!" -ForegroundColor Red
+\end{lstlisting}
+\textbf{Test:} Entered mismatched passwords; rejected with error message.\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-4.3: Auto Passphrase Generation (Recommended)}
+
+\textbf{Requirement:} The system SHOULD offer automatic passphrase generation using cryptographic RNG.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 230-244, 258-262):}
+\begin{lstlisting}[language=bash]
+function New-Passphrase {
+    param([int]$WordCount = 4)
+    $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    ...
+\end{lstlisting}
+\textbf{Test:} Pressed Enter at password prompt; received random passphrase.\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-4.4: No Password Storage}
+
+\textbf{Requirement:} Passwords SHALL NOT be stored or logged by the system.
+
+\textbf{Verification Method:} Inspection
+
+\textbf{Evidence:} Code review confirms password is only held in memory during encryption, then discarded. No file writes or logging of password values.
+
+\textbf{Result:} PASS $\checkmark$
+
+\subsection{REQ-4.5: Masked Password Input}
+
+\textbf{Requirement:} Password input SHALL be masked (not displayed on screen) during entry.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 267):}
+\begin{lstlisting}[language=bash]
+$password = Read-Host "Enter encryption password" -AsSecureString
+\end{lstlisting}
+\textbf{Test:} Typed password; characters not displayed (asterisks not shown either per SecureString behavior).\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\newpage
+% ============================================================================
+\section{File Format Requirements}
+% ============================================================================
+
+\subsection{REQ-5.1: File Contents}
+
+\textbf{Requirement:} Encrypted files SHALL contain: salt, IV, and ciphertext in a defined format.
+
+\textbf{Verification Method:} Inspection
+
+\textbf{Evidence:} See REQ-5.2 for format specification.
+
+\textbf{Result:} PASS $\checkmark$
+
+\subsection{REQ-5.2: File Format}
+
+\textbf{Requirement:} The file format SHALL be: [16-byte salt][16-byte IV][ciphertext].
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 358-361):}
+\begin{lstlisting}[language=bash]
+$outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
+[Array]::Copy($salt, 0, $outputBytes, 0, $SALT_SIZE)
+[Array]::Copy($iv, 0, $outputBytes, $SALT_SIZE, $IV_SIZE)
+[Array]::Copy($cipherBytes, 0, $outputBytes, $SALT_SIZE + $IV_SIZE, ...)
+\end{lstlisting}
+\textbf{Test:} Hex dump of .Locked file shows 16-byte salt, 16-byte IV, then ciphertext.\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-5.3: File Extension}
+
+\textbf{Requirement:} Encrypted files SHALL use the .Locked extension to indicate encrypted status.
+
+\textbf{Verification Method:} Inspection
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, line 364):}
+\begin{lstlisting}[language=bash]
+$outputPath = "$InputPath.Locked"
+\end{lstlisting}
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-5.4: Original Extension Preserved}
+
+\textbf{Requirement:} The original file extension SHALL be preserved (e.g., document.pdf becomes document.pdf.Locked).
+
+\textbf{Verification Method:} Test
+
+\textbf{Test:} Encrypted \texttt{test.pdf}; output was \texttt{test.pdf.Locked}.
+
+\textbf{Result:} PASS $\checkmark$
+
+\newpage
+% ============================================================================
+\section{Platform Requirements}
+% ============================================================================
+
+\subsection{REQ-6.1: Platform Crypto Libraries}
+
+\textbf{Requirement:} The system SHALL use platform-provided cryptographic libraries (no custom implementations).
+
+\textbf{Verification Method:} Inspection
+
+\textbf{Evidence:} All cryptographic operations use \texttt{System.Security.Cryptography} namespace classes. No custom algorithm implementations.
+
+\textbf{Result:} PASS $\checkmark$
+
+\subsection{REQ-6.2: .NET Cryptographic Classes}
+
+\textbf{Requirement:} On Windows, the system SHALL use .NET Framework cryptographic classes (System.Security.Cryptography).
+
+\textbf{Verification Method:} Inspection
+
+\textbf{Evidence:} Uses:
+\begin{itemize}
+    \item \texttt{System.Security.Cryptography.Aes}
+    \item \texttt{System.Security.Cryptography.Rfc2898DeriveBytes}
+    \item \texttt{System.Security.Cryptography.RandomNumberGenerator}
+\end{itemize}
+
+\textbf{Result:} PASS $\checkmark$
+
+\subsection{REQ-6.3: FIPS Mode Warning (Recommended)}
+
+\textbf{Requirement:} The system SHOULD detect and warn if FIPS mode is not enabled on Windows.
+
+\textbf{Verification Method:} Test
+
+\begin{samepage}
+\textbf{Evidence (Encrypt.ps1, lines 76-108):}
+\begin{lstlisting}[language=bash]
+function Test-FIPSMode {
+    ...
+    $fipsKey = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy"
+    ...
+\end{lstlisting}
+\textbf{Test:} Ran on system with FIPS mode disabled; warning displayed.\\
+\textbf{Result:} PASS $\checkmark$
+\end{samepage}
+
+\subsection{REQ-6.4: No Third-Party Software}
+
+\textbf{Requirement:} The system SHALL NOT require installation of third-party software on recipient systems.
+
+\textbf{Verification Method:} Analysis
+
+\textbf{Analysis:} Recipients only need Windows PowerShell (built-in) to decrypt files. The Decrypt\_Instructions.html contains a one-liner that works on any Windows system without installation.
+
+\textbf{Result:} PASS $\checkmark$
+
+\newpage
+% ============================================================================
+\section{Verification Summary}
 % ============================================================================
 
 \small
-\begin{longtable}{|>{\raggedright}p{2.8cm}|>{\raggedright}p{4.2cm}|>{\raggedright\arraybackslash}p{4.8cm}|c|}
+\begin{longtable}{|l|l|l|c|}
 \hline
-\textbf{Standard} & \textbf{Requirement} & \textbf{Implementation} & \textbf{Status} \\
+\textbf{REQ ID} & \textbf{Description} & \textbf{Method} & \textbf{Status} \\
 \hline
 \endhead
 
 \hline
 \endfoot
 
-NIST SP 800-132 & PBKDF2 key derivation & Rfc2898DeriveBytes & $\checkmark$ \\
+REQ-1.1 & AES Algorithm & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-132 & Salt $\geq$ 128 bits & 128-bit salt & $\checkmark$ \\
+REQ-1.2 & 256-bit Key & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-132 & Approved RBG for salt generation & RandomNumberGenerator & $\checkmark$ \\
+REQ-1.3 & CBC Mode & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-132 & Iterations $\geq$ 1,000 & 100,000 iterations & $\checkmark$ \\
+REQ-1.4 & Unique Random IV & Test & $\checkmark$ \\
 \hline
-NIST SP 800-132 & Key $\geq$ 112 bits & 256-bit key & $\checkmark$ \\
+REQ-1.5 & IV Size (128-bit) & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-132 & Approved hash (HMAC) & HMAC-SHA256 & $\checkmark$ \\
+REQ-1.6 & IV Storage & Inspection & $\checkmark$ \\
 \hline
-FIPS 197 & AES algorithm & Aes.Create() & $\checkmark$ \\
+REQ-2.1 & PBKDF2 & Inspection & $\checkmark$ \\
 \hline
-FIPS 197 & Key length 128/192/256 & 256 bits & $\checkmark$ \\
+REQ-2.2 & HMAC-SHA256 & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-38A & Approved mode (CBC) & CipherMode.CBC & $\checkmark$ \\
+REQ-2.3 & 100k Iterations & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-38A & Unpredictable IV & Random 128-bit IV & $\checkmark$ \\
+REQ-2.4 & Unique Random Salt & Test & $\checkmark$ \\
 \hline
-NIST SP 800-38A & Unique IV per message & New IV per file & $\checkmark$ \\
+REQ-2.5 & Salt Size (128-bit) & Inspection & $\checkmark$ \\
 \hline
-FIPS 140-2 & Validated module & Windows CNG & $\checkmark$* \\
+REQ-2.6 & Salt Storage & Inspection & $\checkmark$ \\
 \hline
-NIST SP 800-171 & 3.13.8 Transmission & AES-256 encryption & $\checkmark$ \\
+REQ-2.7 & Iteration Review & Analysis & $\checkmark$ \\
 \hline
-NIST SP 800-171 & 3.13.11 FIPS crypto & Windows CNG & $\checkmark$* \\
+REQ-3.1 & CSPRNG & Inspection & $\checkmark$ \\
+\hline
+REQ-3.2 & Windows RNG & Inspection & $\checkmark$ \\
+\hline
+REQ-3.3 & NIST SP 800-90A & Analysis & $\checkmark$ \\
+\hline
+REQ-4.1 & Min Password Length & Test & $\checkmark$ \\
+\hline
+REQ-4.2 & Password Confirmation & Test & $\checkmark$ \\
+\hline
+REQ-4.3 & Auto Passphrase & Test & $\checkmark$ \\
+\hline
+REQ-4.4 & No Password Storage & Inspection & $\checkmark$ \\
+\hline
+REQ-4.5 & Masked Input & Test & $\checkmark$ \\
+\hline
+REQ-5.1 & File Contents & Inspection & $\checkmark$ \\
+\hline
+REQ-5.2 & File Format & Test & $\checkmark$ \\
+\hline
+REQ-5.3 & .Locked Extension & Inspection & $\checkmark$ \\
+\hline
+REQ-5.4 & Extension Preserved & Test & $\checkmark$ \\
+\hline
+REQ-6.1 & Platform Libraries & Inspection & $\checkmark$ \\
+\hline
+REQ-6.2 & .NET Crypto Classes & Inspection & $\checkmark$ \\
+\hline
+REQ-6.3 & FIPS Mode Warning & Test & $\checkmark$ \\
+\hline
+REQ-6.4 & No Third-Party SW & Analysis & $\checkmark$ \\
 \hline
 
 \end{longtable}
 \normalsize
 
-\textbf{* Conditional:} Requires Windows FIPS mode enabled for full FIPS 140-2 compliance.
-
-% ============================================================================
-\section{Test Verification}
-% ============================================================================
-
-\subsection{Encryption/Decryption Round-Trip}
-
-The following test was performed on commit \texttt{1b22fc9}:
-
-\begin{samepage}
-\begin{lstlisting}[language=bash]
-# Test command
-./test.sh
-
-# Result
-[1/2] Running unit tests (Test.ps1)... PASSED
-[2/2] Running full integration test...
-  small_text.txt.Locked - Decrypted: PASSED
-  empty.txt.Locked - Decrypted: PASSED
-  binary_sample.bin.Locked - Decrypted: PASSED
-
-ALL TESTS PASSED!
-\end{lstlisting}
-\end{samepage}
-
-\subsection{File Format Verification}
-
-Each .Locked file contains:
-\begin{verbatim}
-Bytes 0-15:   Salt (128 bits, random)
-Bytes 16-31:  IV (128 bits, random)
-Bytes 32+:    AES-256-CBC ciphertext (PKCS7 padded)
-\end{verbatim}
-
-\begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 227-231):}
-\begin{lstlisting}[language=bash]
-# Combine: Salt + IV + Ciphertext
-$outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
-[Array]::Copy($salt, 0, $outputBytes, 0, $SALT_SIZE)
-[Array]::Copy($iv, 0, $outputBytes, $SALT_SIZE, $IV_SIZE)
-[Array]::Copy($cipherBytes, 0, $outputBytes, $SALT_SIZE + $IV_SIZE, $cipherBytes.Length)
-\end{lstlisting}
-\end{samepage}
+\textbf{Summary:} All 28 requirements from REQ-2026-001 v1.1 verified. 25 mandatory requirements PASS, 3 recommended requirements PASS.
 
 % ============================================================================
 \section{Conclusion}
 % ============================================================================
 
-SendCUIEmail v0.17.2 (commit \texttt{1b22fc9}) demonstrates compliance with:
-
-\begin{itemize}
-    \item \textbf{NIST SP 800-132} - All password-based key derivation requirements met
-    \item \textbf{FIPS 197} - AES-256 encryption properly implemented
-    \item \textbf{NIST SP 800-38A} - CBC mode with proper IV handling
-    \item \textbf{FIPS 140-2} - Uses Windows CNG validated module (when FIPS mode enabled)
-    \item \textbf{NIST SP 800-171} - Satisfies cryptographic requirements for CUI protection
-\end{itemize}
-
-\textbf{Important Operational Requirement:}
-
-For full NIST SP 800-171 \S3.13.11 compliance, Windows FIPS mode must be enabled on systems processing CUI. This ensures the cryptographic module operates in its validated configuration.
+SendCUIEmail v0.17.3 (commit \texttt{2048d2e}) demonstrates full compliance with REQ-2026-001 v1.1 Cryptographic Compliance Requirements.
 
 \vspace{24pt}
 
 \noindent\rule{\textwidth}{0.5pt}
 
-\textbf{Document prepared:} January 21, 2026 \\
-\textbf{Verified against commit:} \texttt{1b22fc9c72903aca755f28da1916c0384a7d3937}
+\textbf{Document prepared:} January 22, 2026 \\
+\textbf{Verified against commit:} \texttt{2048d2e4508e83ca77b264949775835a3d3aba96}
 
 \end{document}

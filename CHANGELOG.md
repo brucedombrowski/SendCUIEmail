@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.17.3] - 2026-01-22
+
+### Changed
+- **VER Document REQ Traceability** - Verification document now maps directly to REQ IDs
+  - Each section references actual REQ-1.1, REQ-2.1, etc. from REQ-2026-001
+  - Summary table lists all 28 requirements with verification status
+  - Grouped by category: Encryption, Key Derivation, RNG, Password, File Format, Platform
+
 ## [0.17.2] - 2026-01-22
 
 ### Fixed
