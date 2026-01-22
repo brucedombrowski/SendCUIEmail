@@ -1,0 +1,184 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-002}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Maximum File Size Limit for Email Attachments}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-002 File Size Limit},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum establishes the maximum file size limit for SendCUIEmail encrypted attachments and documents the rationale for this limit.
+
+% ----------------------------------------------------------------------------
+\dmsection{Decision}
+
+\textbf{Maximum supported attachment size: 10 MB (10,485,760 bytes)}
+
+Files larger than 10 MB should not be sent via SendCUIEmail. For larger files, users should use alternative secure transfer methods.
+
+% ----------------------------------------------------------------------------
+\dmsection{Rationale}
+
+\textbf{Email Infrastructure Limitations:}
+\begin{itemize}
+    \item Most enterprise email systems impose attachment size limits between 10-25 MB
+    \item Base64 encoding (used in email transmission) increases file size by approximately 33\%
+    \item A 10 MB encrypted file becomes approximately 13.3 MB after Base64 encoding
+    \item Many email gateways reject messages larger than 10-15 MB total
+\end{itemize}
+
+\textbf{Practical Considerations:}
+\begin{itemize}
+    \item Email is not designed for large file transfer
+    \item Large attachments increase risk of delivery failure
+    \item Recipients may have mailbox quotas that prevent receipt
+    \item Email filters may quarantine or reject large attachments
+\end{itemize}
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item Larger files require more time to encrypt/decrypt, increasing exposure risk
+    \item Failed transfers may result in incomplete data on intermediate systems
+    \item Log files and email archives may retain copies indefinitely
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Alternative Methods for Large Files}
+
+For files exceeding 10 MB, use one of these approved methods:
+
+\begin{itemize}
+    \item \textbf{Secure File Transfer Services}: Organization-approved SFTP or cloud storage with encryption at rest
+    \item \textbf{Encrypted USB Media}: Physical transfer using FIPS 140-2 validated encrypted drives
+    \item \textbf{Secure File Sharing Platforms}: DoD SAFE, MilSuite, or similar approved platforms
+    \item \textbf{Split Archives}: For files slightly over the limit, consider splitting into multiple encrypted archives (not recommended for CUI due to complexity)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Implementation}
+
+The file size limit is implemented as follows:
+
+\begin{itemize}
+    \item \textbf{Warning}: Files approaching 10 MB will display a warning
+    \item \textbf{Test Coverage}: The test suite includes a 10 MB file to verify maximum size handling
+    \item \textbf{Documentation}: User documentation clearly states the limit
+    \item \textbf{No Hard Block}: The tool does not prevent encryption of larger files, but users are warned
+\end{itemize}
+
+\textbf{Note}: This is a ``moral limit'' rather than a technical enforcement. Users are trusted to use appropriate methods for large file transfer.
+
+% ----------------------------------------------------------------------------
+\dmsection{Test Data}
+
+The following test files are provided in the \texttt{testdata/} directory:
+
+\begin{tabularx}{\textwidth}{|l|r|X|}
+\hline
+\textbf{File} & \textbf{Size} & \textbf{Purpose} \\
+\hline
+\texttt{small\_text.txt} & 138 B & Basic text file \\
+\hline
+\texttt{empty.txt} & 0 B & Edge case: empty file \\
+\hline
+\texttt{binary\_sample.bin} & 1 KB & Binary with null bytes \\
+\hline
+\texttt{README.pdf} & 175 KB & Generated from README.md \\
+\hline
+\texttt{medium\_file.bin} & 1 MB & Medium binary file \\
+\hline
+\texttt{large\_file\_10mb.bin} & 10 MB & Maximum size test \\
+\hline
+\end{tabularx}
+
+% ----------------------------------------------------------------------------
+\dmsection{References}
+
+\begin{itemize}
+    \item RFC 5321 (SMTP): Recommends message size limits
+    \item NIST SP 800-171: CUI handling requirements
+    \item DoD Instruction 8170.01: Online Information Management
+    \item Organization email policy (varies by deployment)
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}

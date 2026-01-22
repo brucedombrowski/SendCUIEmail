@@ -1,0 +1,202 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{courier}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-001}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Cross-Platform PowerShell Support Decision}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-001 Cross-Platform PowerShell Support},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% Code listing style
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum documents the decision to implement cross-platform support for SendCUIEmail, enabling the encryption and decryption scripts to run on both Windows PowerShell 5.1+ and PowerShell Core 7+ (macOS and Linux).
+
+% ----------------------------------------------------------------------------
+\dmsection{Background}
+
+SendCUIEmail was initially designed for Windows 11 environments to encrypt files for secure email transmission of CUI (Controlled Unclassified Information). The tool uses AES-256-CBC encryption with PBKDF2 key derivation, which are standard cryptographic algorithms available in .NET across all platforms.
+
+During development, a requirement emerged to enable developers to test the core encryption/decryption logic on macOS development workstations without requiring a Windows virtual machine. This capability improves development velocity and enables continuous integration testing on non-Windows platforms.
+
+% ----------------------------------------------------------------------------
+\dmsection{Technical Analysis}
+
+The primary compatibility issue between Windows PowerShell and PowerShell Core is the \texttt{SecureString} to plain text conversion. The standard Windows approach uses Marshal methods:
+
+\begin{lstlisting}[language=PowerShell]
+$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($password)
+$plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+\end{lstlisting}
+
+This approach fails on non-Windows platforms because \texttt{PtrToStringAuto} behaves differently. The cross-platform alternative uses the \texttt{NetworkCredential} class:
+
+\begin{lstlisting}[language=PowerShell]
+$plain = [System.Net.NetworkCredential]::new('', $password).Password
+\end{lstlisting}
+
+\textbf{Platform Detection:} PowerShell Core exposes the \texttt{\$IsWindows}, \texttt{\$IsMacOS}, and \texttt{\$IsLinux} automatic variables. Windows PowerShell (Desktop edition) does not define these, so we detect the platform using:
+
+\begin{lstlisting}[language=PowerShell]
+$IsWindowsPlatform = $PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows
+\end{lstlisting}
+
+% ----------------------------------------------------------------------------
+\dmsection{Scope of Changes}
+
+The following modifications were made to support cross-platform operation:
+
+\begin{itemize}
+    \item Added \texttt{ConvertFrom-SecureStringPlain} helper function that uses platform-appropriate conversion
+    \item Added \texttt{\$IsWindowsPlatform} detection variable
+    \item Updated \texttt{Get-SecurePassword} in Encrypt.ps1 to use the helper function
+    \item Updated \texttt{Get-Password} in Decrypt.ps1 to use the helper function
+    \item Added platform check in \texttt{Generate-OutlookEmail} to skip .msg generation on non-Windows
+    \item Updated script documentation to note cross-platform support
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Platform-Specific Limitations}
+
+The following features remain Windows-only:
+
+\begin{itemize}
+    \item \textbf{Outlook .msg Generation:} Requires Outlook COM automation, only available on Windows with Microsoft Outlook installed
+    \item \textbf{Batch File Launchers:} The .bat files are Windows-specific; macOS/Linux users must invoke PowerShell directly
+\end{itemize}
+
+These limitations are acceptable because:
+\begin{itemize}
+    \item The target deployment environment is Windows 11
+    \item macOS/Linux support is primarily for development and testing
+    \item Core encryption/decryption functionality works identically across platforms
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Security Considerations}
+
+\textbf{No reduction in security posture:}
+\begin{itemize}
+    \item The cryptographic algorithms (AES-256-CBC, PBKDF2-HMAC-SHA256) are identical across platforms
+    \item The encrypted file format is unchanged and interoperable
+    \item Files encrypted on Windows can be decrypted on macOS/Linux and vice versa
+    \item The \texttt{NetworkCredential} approach for SecureString conversion is a documented .NET pattern
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Decision}
+
+\textbf{APPROVED:} Implement cross-platform support as described above.
+
+\textbf{Rationale:}
+\begin{itemize}
+    \item Enables faster development iteration without Windows VM dependency
+    \item Supports CI/CD testing on multiple platforms
+    \item No security impact---cryptographic operations are unchanged
+    \item Graceful degradation for Windows-only features (Outlook .msg)
+    \item Maintains full compatibility with existing encrypted files
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Testing Requirements}
+
+The following test scenarios must pass on both Windows and macOS/Linux:
+
+\begin{itemize}
+    \item Encrypt single file → Decrypt → Verify contents match
+    \item Encrypt multiple files → Decrypt all → Verify contents match
+    \item Wrong password rejection
+    \item Empty file handling
+    \item Binary files with null bytes
+    \item Cross-platform interoperability (encrypt on macOS, decrypt on Windows)
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,210 @@
+% ============================================================================
+% SendCUIEmail Test Document
+% ============================================================================
+% This LaTeX document compiles to a PDF used for testing the encryption tool.
+% The content describes SendCUIEmail itself - dog fooding at its finest.
+%
+% Compile: pdflatex test_document.tex
+% Or: latexmk -pdf test_document.tex
+% ============================================================================
+
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{courier}
+
+% ============================================================================
+% CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdfborder={0 0 0},
+    pdftitle={SendCUIEmail - File Encryption Tool},
+    pdfauthor={SendCUIEmail},
+}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+% Code listing style
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    xleftmargin=0.5cm,
+    xrightmargin=0.5cm,
+}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{CONTROLLED UNCLASSIFIED INFORMATION (CUI)}}
+\fancyhead[R]{\small SendCUIEmail Test Document}
+\fancyfoot[L]{\small CUI}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \today}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+\begin{document}
+
+% Banner marking
+\begin{center}
+\colorbox{yellow!30}{\parbox{0.95\textwidth}{\centering\textbf{CUI - CONTROLLED UNCLASSIFIED INFORMATION}\\
+\small This document is for testing SendCUIEmail encryption. Handle accordingly.}}
+\end{center}
+
+\vspace{0.25in}
+
+% Title
+\begin{center}
+\LARGE\textbf{SendCUIEmail}\\[6pt]
+\large File Encryption Tool for Secure Email Transmission\\[12pt]
+\normalsize FIPS 140-2 / NIST SP 800-171 Compliant
+\end{center}
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+\section*{Purpose}
+% ----------------------------------------------------------------------------
+
+SendCUIEmail encrypts files for secure transmission via email when certificate exchange is not possible. It generates encrypted files that recipients can decrypt using built-in Windows PowerShell commands---no executables, no scripts, no zip bundles required.
+
+This document serves as a test file for the encryption tool. If you can read this after decryption, the tool is working correctly.
+
+% ----------------------------------------------------------------------------
+\section*{Technical Specifications}
+% ----------------------------------------------------------------------------
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Encryption Algorithm & AES-256-CBC \\
+\hline
+Key Derivation & PBKDF2-HMAC-SHA256 \\
+\hline
+Iterations & 100,000 \\
+\hline
+Salt Size & 128 bits (random per file) \\
+\hline
+IV Size & 128 bits (random per file) \\
+\hline
+Minimum Password & 8 characters \\
+\hline
+\end{tabularx}
+
+\vspace{12pt}
+
+\textbf{File Format:} Salt (16 bytes) + IV (16 bytes) + Ciphertext
+
+% ----------------------------------------------------------------------------
+\section*{Compliance}
+% ----------------------------------------------------------------------------
+
+This tool meets the following security standards:
+
+\begin{itemize}
+    \item \textbf{FIPS 140-2:} AES-256-CBC is a FIPS-approved encryption algorithm
+    \item \textbf{NIST SP 800-132:} PBKDF2 key derivation with recommended iteration count
+    \item \textbf{NIST SP 800-171:} CUI handling requirements
+    \item \textbf{32 CFR Part 2002:} CUI marking requirements
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\section*{CUI Categories Supported}
+% ----------------------------------------------------------------------------
+
+\begin{enumerate}
+    \item \texttt{CUI} -- Basic Controlled Unclassified Information
+    \item \texttt{CUI//SP-CTI} -- Controlled Technical Information
+    \item \texttt{CUI//SP-EXPT} -- Export Controlled
+    \item \texttt{CUI//SP-PRVCY} -- Privacy
+    \item \texttt{CUI//SP-PROPIN} -- Proprietary Business Information
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\section*{Usage}
+% ----------------------------------------------------------------------------
+
+\subsection*{Encryption (Sender)}
+
+Drag files onto \texttt{Encrypt.bat} or run:
+
+\begin{lstlisting}
+Encrypt.bat document.pdf
+Encrypt.bat "C:\Folder\To\Encrypt"
+\end{lstlisting}
+
+\subsection*{Decryption (Recipient)}
+
+Recipients paste this PowerShell one-liner:
+
+\begin{lstlisting}[breaklines=true]
+$f=Read-Host "File";$p=Read-Host "Password" -AsSecureString;
+$d=[IO.File]::ReadAllBytes($f);
+$k=[Security.Cryptography.Rfc2898DeriveBytes]::new(
+  [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+  [Runtime.InteropServices.Marshal]::SecureStringToBSTR($p)),
+  $d[0..15],100000,"SHA256");
+$a=[Security.Cryptography.Aes]::Create();
+$a.Key=$k.GetBytes(32);$a.IV=$d[16..31];
+$c=$a.CreateDecryptor().TransformFinalBlock($d,32,$d.Length-32);
+[IO.File]::WriteAllBytes($f-replace'\.Locked$','',$c);
+Write-Host "Decrypted:"($f-replace'\.Locked$','')
+\end{lstlisting}
+
+% ----------------------------------------------------------------------------
+\section*{Security Reminders}
+% ----------------------------------------------------------------------------
+
+\begin{itemize}
+    \item Share the decryption password via a \textbf{separate channel} (phone, text message, in-person)
+    \item \textbf{Verify recipient authorization} for CUI before transmission
+    \item \textbf{Document transmission} per your organization's retention policy
+    \item Encrypted files should be deleted after successful decryption and processing
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\section*{Verification}
+% ----------------------------------------------------------------------------
+
+If you are reading this document after decrypting \texttt{test\_document.pdf.Locked}, then:
+
+\begin{enumerate}
+    \item The encryption algorithm is functioning correctly
+    \item The key derivation is producing the expected key
+    \item The decryption process restored the original file
+    \item The file integrity was preserved through the round-trip
+\end{enumerate}
+
+\textbf{Test Status:} \colorbox{green!30}{\textbf{PASS}} -- Encryption/Decryption Verified
+
+% ----------------------------------------------------------------------------
+\vspace{0.5in}
+\begin{center}
+\colorbox{yellow!30}{\parbox{0.95\textwidth}{\centering\textbf{CUI - CONTROLLED UNCLASSIFIED INFORMATION}\\
+\small End of Document}}
+\end{center}
+
+\end{document}
