@@ -749,6 +749,10 @@ if ($encryptedFiles.Count -gt 0) {
     Write-Host "OTHER REMINDERS:" -ForegroundColor Yellow
     Write-Host "  - Verify recipient is authorized for CUI" -ForegroundColor Yellow
     Write-Host "  - Document transmission per your retention policy" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "CLEANUP (after sending):" -ForegroundColor Yellow
+    Write-Host "  - Delete .msg files from output folder" -ForegroundColor Yellow
+    Write-Host "  - Password_Email contains plaintext password" -ForegroundColor Red
 }
 else {
     Write-Host ""
