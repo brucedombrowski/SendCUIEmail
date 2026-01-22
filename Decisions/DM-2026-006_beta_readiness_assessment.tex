@@ -1,0 +1,236 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{amssymb}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-006}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{SendCUIEmail Development Team}
+\newcommand{\AuthorTitle}{Software Engineering}
+\newcommand{\ToField}{Project Record}
+\newcommand{\SubjectField}{Beta Testing Readiness Assessment}
+\newcommand{\OPRField}{SendCUIEmail Project}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0},
+    pdftitle={DM-2026-006 Beta Readiness Assessment},
+    pdfauthor={SendCUIEmail Project},
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{SendCUIEmail}}
+\fancyhead[R]{\parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% Define colors for status
+\definecolor{passgreen}{RGB}{34,139,34}
+\definecolor{warncolor}{RGB}{204,102,0}
+\definecolor{failred}{RGB}{178,34,34}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum documents a readiness assessment for beta testing of SendCUIEmail v0.5.2 with users who have limited technical capability but knowledge of CUI handling requirements.
+
+% ----------------------------------------------------------------------------
+\dmsection{Target Audience Profile}
+
+\textbf{Beta Tester Characteristics:}
+\begin{itemize}
+    \item Familiar with CUI marking requirements (32 CFR Part 2002)
+    \item Understands need for encryption when transmitting CUI via email
+    \item Limited command-line experience
+    \item Comfortable with Windows desktop applications
+    \item May not know what ``PowerShell'' is
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Readiness Assessment}
+
+\subsection*{Sender Experience (Encryption)}
+
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Feature} & \textbf{Status} & \textbf{Notes} \\
+\hline
+Windows entry point & \textcolor{passgreen}{$\checkmark$} & Double-click \texttt{Encrypt.bat} \\
+\hline
+CUI category selection & \textcolor{passgreen}{$\checkmark$} & Clear menu with multi-select support \\
+\hline
+Password prompts & \textcolor{passgreen}{$\checkmark$} & Requirements shown upfront \\
+\hline
+Error messages & \textcolor{passgreen}{$\checkmark$} & Colored, clear guidance \\
+\hline
+Compliance reminders & \textcolor{passgreen}{$\checkmark$} & [COMPLIANT]/[NOT COMPLIANT] labels \\
+\hline
+Cleanup guidance & \textcolor{passgreen}{$\checkmark$} & .msg deletion reminder \\
+\hline
+Output location clarity & \textcolor{warncolor}{$\triangle$} & Folder created in current directory \\
+\hline
+Outlook integration & \textcolor{passgreen}{$\checkmark$} & .msg drafts auto-generated (Windows) \\
+\hline
+\end{tabularx}
+
+\subsection*{Recipient Experience (Decryption)}
+
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Feature} & \textbf{Status} & \textbf{Notes} \\
+\hline
+README instructions & \textcolor{passgreen}{$\checkmark$} & Step-by-step included with files \\
+\hline
+Decrypt.bat available & \textcolor{passgreen}{$\checkmark$} & Double-click entry point \\
+\hline
+PowerShell one-liner & \textcolor{passgreen}{$\checkmark$} & Copy-paste decryption option \\
+\hline
+No external dependencies & \textcolor{passgreen}{$\checkmark$} & Uses built-in Windows APIs \\
+\hline
+File path handling & \textcolor{warncolor}{$\triangle$} & Requires understanding of file locations \\
+\hline
+Password visibility & \textcolor{warncolor}{$\triangle$} & No characters shown while typing \\
+\hline
+\end{tabularx}
+
+\subsection*{Documentation}
+
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Feature} & \textbf{Status} & \textbf{Notes} \\
+\hline
+In-tool guidance & \textcolor{passgreen}{$\checkmark$} & Console shows compliance info \\
+\hline
+README for recipients & \textcolor{passgreen}{$\checkmark$} & Generated with each encryption \\
+\hline
+Quick-start guide & \textcolor{failred}{$\times$} & Not yet created \\
+\hline
+Video walkthrough & \textcolor{failred}{$\times$} & Not yet created \\
+\hline
+\end{tabularx}
+
+% ----------------------------------------------------------------------------
+\dmsection{Identified Concerns}
+
+\textbf{High Priority:}
+\begin{enumerate}
+    \item \textbf{Output Location Confusion} -- Files are created in a timestamped subdirectory of the current working directory. Non-technical users may not understand where ``current directory'' is.
+
+    \item \textbf{Password Entry UX} -- Console password prompts show no characters while typing (security feature). Users may think nothing is happening.
+
+    \item \textbf{Recipient File Path Handling} -- Recipients need to navigate to where they saved the .Locked files. No drag-and-drop support.
+\end{enumerate}
+
+\textbf{Medium Priority:}
+\begin{enumerate}
+    \item \textbf{No Quick-Start Guide} -- Users would benefit from a 1-page PDF with screenshots.
+
+    \item \textbf{``What is PowerShell?''} -- Some users have never seen a PowerShell window.
+
+    \item \textbf{Weak Password Acceptance} -- Tool accepts ``12345678'' (meets 8-char minimum but is trivially guessable).
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Assessment Summary}
+
+\begin{center}
+\Large\textbf{CONDITIONALLY READY FOR BETA}
+\end{center}
+
+\textbf{Rationale:} Core functionality is complete and tested. The tool correctly encrypts files using FIPS-compliant algorithms, generates proper CUI markings, and provides compliance guidance. However, some UX friction exists for non-technical users.
+
+\textbf{Recommended for Beta With:}
+\begin{itemize}
+    \item Brief verbal walkthrough or screen share for first-time users
+    \item Technical support contact available during initial testing
+    \item Feedback collection on specific pain points
+\end{itemize}
+
+\textbf{Not Recommended Without:}
+\begin{itemize}
+    \item Some form of user orientation (even informal)
+    \item Expectation setting that this is command-line based
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Recommendations Before Wider Release}
+
+\begin{enumerate}
+    \item Create a 1-page Quick-Start Guide (PDF with screenshots)
+    \item Add note about password entry: ``Characters will not appear as you type''
+    \item Consider adding output path to final summary (full path, not just folder name)
+    \item Document the ``where are my files?'' answer prominently
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Version Information}
+
+\begin{tabular}{ll}
+\textbf{Version Assessed:} & v0.5.2 \\
+\textbf{Assessment Date:} & January 21, 2026 \\
+\textbf{Git Commit:} & \texttt{9f87a00} \\
+\end{tabular}
+
+\end{enumerate}
+
+\end{document}
