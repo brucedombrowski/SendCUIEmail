@@ -1,8 +1,23 @@
 #!/bin/bash
 # SendCUIEmail - Run encryption round-trip tests (macOS/Linux)
 # Requires PowerShell Core: brew install powershell
+# Usage: ./test.sh [--version X.Y.Z]
 
 set -e
+
+# Parse arguments
+TARGET_VERSION=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --version)
+            TARGET_VERSION="$2"
+            shift 2
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
 
 # Get script directory (needed early for log file)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -444,8 +459,12 @@ if [ $TOTAL_FAILED -eq 0 ]; then
         GIT_COMMIT_FULL=$(git rev-parse HEAD)
         GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)
         GIT_COMMIT_DATE=$(git log -1 --format="%ci")
-        # Extract version from CHANGELOG.md (first version after [Unreleased])
-        VERSION=$(grep -E '^\#\# \[[0-9]+\.[0-9]+\.[0-9]+\]' "${SCRIPT_DIR}/CHANGELOG.md" | head -1 | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+        # Use target version if provided, otherwise extract from CHANGELOG.md
+        if [ -n "$TARGET_VERSION" ]; then
+            VERSION="$TARGET_VERSION"
+        else
+            VERSION=$(grep -E '^\#\# \[[0-9]+\.[0-9]+\.[0-9]+\]' "${SCRIPT_DIR}/CHANGELOG.md" | head -1 | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+        fi
 
         echo "  Updating verification document with current commit info..."
         echo "    Version: v${VERSION}"

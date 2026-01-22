@@ -120,7 +120,7 @@ if [ "$SKIP_TESTS" = true ]; then
 else
     echo -e "${CYAN}[2/3] Running tests...${NC}"
     if [ -x "$SCRIPT_DIR/test.sh" ]; then
-        if ! "$SCRIPT_DIR/test.sh"; then
+        if ! "$SCRIPT_DIR/test.sh" --version "$VERSION"; then
             echo -e "${RED}ERROR: Tests failed. Fix issues before releasing.${NC}"
             exit 1
         fi

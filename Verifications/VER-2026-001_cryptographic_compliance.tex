@@ -63,7 +63,7 @@
 \title{
     \textbf{VER-2026-001} \\
     \Large Cryptographic Compliance Verification \\
-    \large SendCUIEmail v0.11.0
+    \large SendCUIEmail v0.13.0
 }
 \author{Verification Document}
 \date{January 21, 2026}
@@ -77,9 +77,10 @@
 \begin{tabular}{ll}
 \textbf{Document ID:} & VER-2026-001 \\
 \textbf{Subject:} & Cryptographic Implementation Compliance Verification \\
-\textbf{Version Tested:} & v0.11.0 \\
-\textbf{Git Commit:} & \texttt{1dc8025ae44554063a599673bc448a53271496bf} \\
-\textbf{Commit Date:} & 2026-01-22 09:29:49 -0600 \\
+\textbf{Requirements:} & REQ-2026-001 (Requirements/REQ-2026-001\_cryptographic\_compliance.json) \\
+\textbf{Version Tested:} & v0.13.0 \\
+\textbf{Git Commit:} & \texttt{a69fe1d95f148828e3e60d9d9eead7650e1530b6} \\
+\textbf{Commit Date:} & 2026-01-22 09:36:28 -0600 \\
 \textbf{Source File:} & \texttt{Encrypt.ps1} \\
 \end{tabular}
 
@@ -459,7 +460,7 @@ NIST SP 800-171 & 3.13.11 FIPS crypto & Windows CNG & $\checkmark$* \\
 
 \subsection{Encryption/Decryption Round-Trip}
 
-The following test was performed on commit \texttt{1dc8025}:
+The following test was performed on commit \texttt{a69fe1d}:
 
 \begin{samepage}
 \begin{lstlisting}[language=bash]
@@ -501,7 +502,7 @@ $outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
 \section{Conclusion}
 % ============================================================================
 
-SendCUIEmail v0.11.0 (commit \texttt{1dc8025}) demonstrates compliance with:
+SendCUIEmail v0.13.0 (commit \texttt{a69fe1d}) demonstrates compliance with:
 
 \begin{itemize}
     \item \textbf{NIST SP 800-132} - All password-based key derivation requirements met
@@ -520,6 +521,6 @@ For full NIST SP 800-171 \S3.13.11 compliance, Windows FIPS mode must be enabled
 \noindent\rule{\textwidth}{0.5pt}
 
 \textbf{Document prepared:} January 21, 2026 \\
-\textbf{Verified against commit:} \texttt{1dc8025ae44554063a599673bc448a53271496bf}
+\textbf{Verified against commit:} \texttt{a69fe1d95f148828e3e60d9d9eead7650e1530b6}
 
 \end{document}

@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
+## [0.13.0] - 2026-01-22
+
+### Fixed
+- **VER Document Version Sync** - Verification document now shows correct release version
+  - `test.sh` accepts `--version` parameter for target version
+  - `stage-release.sh` passes target version to test.sh
+  - Previously VER doc would show previous release version
+
+### Changed
+- **VER→REQ Traceability** - VER-2026-001 now references REQ-2026-001
+  - Document Information section includes Requirements reference
+  - Links verification back to requirements JSON source
+
 ## [0.12.0] - 2026-01-22
 
 ### Changed
