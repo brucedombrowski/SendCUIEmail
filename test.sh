@@ -390,6 +390,32 @@ if [ $TOTAL_FAILED -eq 0 ]; then
 
         pushd "${SCRIPT_DIR}/Decisions" > /dev/null
 
+        # Get current git info for verification document
+        GIT_COMMIT_FULL=$(git rev-parse HEAD)
+        GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)
+        GIT_COMMIT_DATE=$(git log -1 --format="%ci")
+        # Extract version from CHANGELOG.md (first version after [Unreleased])
+        VERSION=$(grep -E '^\#\# \[[0-9]+\.[0-9]+\.[0-9]+\]' "${SCRIPT_DIR}/CHANGELOG.md" | head -1 | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+
+        echo "  Updating verification document with current commit info..."
+        echo "    Version: v${VERSION}"
+        echo "    Commit: ${GIT_COMMIT_SHORT}"
+
+        # Update version and commit info in .tex file using sed
+        # Title page version
+        sed -i.bak "s/SendCUIEmail v[0-9.]*$/SendCUIEmail v${VERSION}/" VER-2026-001_cryptographic_compliance.tex
+        # Document info table
+        sed -i.bak "s/Version Tested:} & v[0-9.]*/Version Tested:} \& v${VERSION}/" VER-2026-001_cryptographic_compliance.tex
+        sed -i.bak "s/Git Commit:} & \\\\texttt{[a-f0-9]*}/Git Commit:} \& \\\\texttt{${GIT_COMMIT_FULL}}/" VER-2026-001_cryptographic_compliance.tex
+        sed -i.bak "s/Commit Date:} & [0-9-]* [0-9:]* [-+][0-9]*/Commit Date:} \& ${GIT_COMMIT_DATE}/" VER-2026-001_cryptographic_compliance.tex
+        # Test verification section
+        sed -i.bak "s/performed on commit \\\\texttt{[a-f0-9]*}/performed on commit \\\\texttt{${GIT_COMMIT_SHORT}}/" VER-2026-001_cryptographic_compliance.tex
+        # Conclusion
+        sed -i.bak "s/SendCUIEmail v[0-9.]* (commit \\\\texttt{[a-f0-9]*})/SendCUIEmail v${VERSION} (commit \\\\texttt{${GIT_COMMIT_SHORT}})/" VER-2026-001_cryptographic_compliance.tex
+        # Footer
+        sed -i.bak "s/Verified against commit:} \\\\texttt{[a-f0-9]*}/Verified against commit:} \\\\texttt{${GIT_COMMIT_FULL}}/" VER-2026-001_cryptographic_compliance.tex
+        rm -f VER-2026-001_cryptographic_compliance.tex.bak
+
         # Run pdflatex twice for cross-references
         echo -n "  Compiling VER-2026-001... "
         if pdflatex -interaction=nonstopmode VER-2026-001_cryptographic_compliance.tex > /dev/null 2>&1 && \

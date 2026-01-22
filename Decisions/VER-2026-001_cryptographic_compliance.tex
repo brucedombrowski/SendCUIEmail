@@ -63,7 +63,7 @@
 \title{
     \textbf{VER-2026-001} \\
     \Large Cryptographic Compliance Verification \\
-    \large SendCUIEmail v0.1.0
+    \large SendCUIEmail v0.2.0
 }
 \author{Verification Document}
 \date{January 21, 2026}
@@ -77,9 +77,9 @@
 \begin{tabular}{ll}
 \textbf{Document ID:} & VER-2026-001 \\
 \textbf{Subject:} & Cryptographic Implementation Compliance Verification \\
-\textbf{Version Tested:} & v0.1.0 \\
-\textbf{Git Commit:} & \texttt{394bcc1e32afb4b985d5b0dbcb4bf35b231b44be} \\
-\textbf{Commit Date:} & 2026-01-21 20:03:40 -0600 \\
+\textbf{Version Tested:} & v0.2.0 \\
+\textbf{Git Commit:} & \texttt{b5242999f66b50f52ab4d550b3f40ca09f3b943c} \\
+\textbf{Commit Date:} & 2026-01-21 20:51:08 -0600 \\
 \textbf{Source File:} & \texttt{Encrypt.ps1} \\
 \end{tabular}
 
@@ -459,7 +459,7 @@ NIST SP 800-171 & 3.13.11 FIPS crypto & Windows CNG & $\checkmark$* \\
 
 \subsection{Encryption/Decryption Round-Trip}
 
-The following test was performed on commit \texttt{29804e7}:
+The following test was performed on commit \texttt{b524299}:
 
 \begin{samepage}
 \begin{lstlisting}[language=bash]
@@ -501,7 +501,7 @@ $outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
 \section{Conclusion}
 % ============================================================================
 
-SendCUIEmail v0.2.0 (commit \texttt{29804e7}) demonstrates compliance with:
+SendCUIEmail v0.2.0 (commit \texttt{b524299}) demonstrates compliance with:
 
 \begin{itemize}
     \item \textbf{NIST SP 800-132} - All password-based key derivation requirements met
@@ -520,6 +520,6 @@ For full NIST SP 800-171 \S3.13.11 compliance, Windows FIPS mode must be enabled
 \noindent\rule{\textwidth}{0.5pt}
 
 \textbf{Document prepared:} January 21, 2026 \\
-\textbf{Verified against commit:} \texttt{29804e71b88bc5db05451efea185f3c9da15687b}
+\textbf{Verified against commit:} \texttt{b5242999f66b50f52ab4d550b3f40ca09f3b943c}
 
 \end{document}
