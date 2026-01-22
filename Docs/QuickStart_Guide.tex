@@ -44,6 +44,34 @@
 \vspace{-0.1in}
 
 % ============================================================================
+% BEFORE YOU BEGIN
+% ============================================================================
+\section*{Before You Begin: Choose the Right Method}
+
+\colorbox{lightgreen}{\parbox{\dimexpr\textwidth-2\fboxsep}{
+\textbf{PREFERRED: S/MIME Encrypted Email}\\[3pt]
+If you have your recipient's S/MIME certificate (PIV, CAC, or other), use S/MIME:
+\begin{enumerate}[leftmargin=0.3in, topsep=2pt, itemsep=0pt]
+    \item Compose your email in Outlook with CUI files attached
+    \item Click \textbf{Sign} (proves it's from you) and \textbf{Encrypt} (only they can read it)
+    \item The email is automatically secured end-to-end -- no password needed
+\end{enumerate}
+}}
+
+\vspace{6pt}
+
+\textbf{Use SendCUIEmail when:}
+\begin{itemize}[leftmargin=0.3in, topsep=2pt, itemsep=0pt]
+    \item You don't have the recipient's S/MIME certificate
+    \item Your recipient doesn't have PKI capability (no PIV/CAC/S/MIME)
+    \item You need to send CUI to external partners or contractors
+\end{itemize}
+
+\textbf{TIP:} Even when using SendCUIEmail, \textbf{sign your email} if you have a PIV/CAC. This proves the email came from you (authenticity) even though the recipient can't receive S/MIME encrypted mail.
+
+\vspace{-0.1in}
+
+% ============================================================================
 % SENDER INSTRUCTIONS
 % ============================================================================
 \section*{Part A: Encrypting Files (Sender)}
@@ -79,6 +107,7 @@
 \begin{enumerate}[leftmargin=0.4in, topsep=2pt]
     \item Find the output folder (path shown in yellow)
     \item Attach the \texttt{.Locked} files and \texttt{README.md} to your email
+    \item If you have a PIV/CAC, click \textbf{Sign} before sending (proves it's from you)
     \item Send the email to your recipient
 \end{enumerate}
 
