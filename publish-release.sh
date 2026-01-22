@@ -213,20 +213,18 @@ zip -r "$ZIP_NAME" SendCUIEmail > /dev/null
 cd "$SCRIPT_DIR"
 echo -e "  ${GREEN}Created: $ZIP_NAME${NC}"
 
-# Step 6: Delete old GitHub releases
+# Step 6: Delete old GitHub releases (keep tags for history)
 echo ""
 echo -e "${CYAN}[6/7] Cleaning up old releases...${NC}"
 if command -v gh &> /dev/null; then
-    # Get list of old releases and delete them
+    # Get list of old releases and delete them (tags are preserved)
     OLD_RELEASES=$(gh release list --json tagName -q '.[].tagName' 2>/dev/null)
     if [ -n "$OLD_RELEASES" ]; then
         for old_tag in $OLD_RELEASES; do
-            echo -e "  Deleting release: $old_tag"
+            echo -e "  Deleting release: $old_tag (tag preserved)"
             gh release delete "$old_tag" --yes 2>/dev/null || true
-            # Also delete the git tag from remote
-            git push origin ":refs/tags/$old_tag" 2>/dev/null || true
         done
-        echo -e "  ${GREEN}Old releases removed${NC}"
+        echo -e "  ${GREEN}Old releases removed (tags kept for history)${NC}"
     else
         echo -e "  No old releases to clean up"
     fi
