@@ -179,6 +179,11 @@ function Get-CUICategory {
 function Get-SecurePassword {
     param([int]$MaxAttempts = 3)
 
+    Write-Host "Password Requirements:" -ForegroundColor Yellow
+    Write-Host "  - Minimum 8 characters" -ForegroundColor Gray
+    Write-Host "  - Will be transmitted out-of-band (phone, SMS, in-person)" -ForegroundColor Gray
+    Write-Host ""
+
     for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
         if ($attempt -gt 1) {
             Write-Host ""
@@ -736,9 +741,12 @@ if ($encryptedFiles.Count -gt 0) {
     Write-Host ""
     Write-Host "Location: $outputDir" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "SECURITY REMINDERS:" -ForegroundColor Yellow
-    Write-Host "  - PREFERRED: Share password via phone, text, or in-person" -ForegroundColor Yellow
-    Write-Host "  - If using email: Send password SEPARATELY from encrypted files" -ForegroundColor Yellow
+    Write-Host "PASSWORD TRANSMISSION (per NIST SP 800-63B):" -ForegroundColor Yellow
+    Write-Host "  [COMPLIANT] Phone call, SMS, or in-person" -ForegroundColor Green
+    Write-Host "  [COMPLIANT] S/MIME encrypted email (if recipient has PIV/CAC)" -ForegroundColor Green
+    Write-Host "  [NOT COMPLIANT] Unencrypted email - even if separate" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "OTHER REMINDERS:" -ForegroundColor Yellow
     Write-Host "  - Verify recipient is authorized for CUI" -ForegroundColor Yellow
     Write-Host "  - Document transmission per your retention policy" -ForegroundColor Yellow
 }
