@@ -111,7 +111,7 @@ December 2010 \\
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 155-162):}
+\textbf{Implementation (Encrypt.ps1, lines 207-213):}
 \begin{lstlisting}[language=bash]
 # Derive key using PBKDF2
 $keyDeriver = New-Object System.Security.Cryptography.Rfc2898DeriveBytes(
@@ -133,7 +133,7 @@ $key = $keyDeriver.GetBytes($KEY_SIZE)
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 37, 150-152):}
+\textbf{Implementation (Encrypt.ps1, lines 37, 201-203):}
 \begin{lstlisting}[language=bash]
 $SALT_SIZE = 16       # bytes (128 bits)
 ...
@@ -151,7 +151,7 @@ $rng.GetBytes($salt)
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 149, 152):}
+\textbf{Implementation (Encrypt.ps1, lines 200, 203):}
 \begin{lstlisting}[language=bash]
 $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
 ...
@@ -183,7 +183,7 @@ $ITERATIONS = 100000  # PBKDF2 iterations (NIST SP 800-132 recommends minimum 10
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 38, 162):}
+\textbf{Implementation (Encrypt.ps1, lines 38, 213):}
 \begin{lstlisting}[language=bash]
 $KEY_SIZE = 32        # bytes (256 bits for AES-256)
 ...
@@ -200,7 +200,7 @@ $key = $keyDeriver.GetBytes($KEY_SIZE)
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 160):}
+\textbf{Implementation (Encrypt.ps1, line 211):}
 \begin{lstlisting}[language=bash]
 [System.Security.Cryptography.HashAlgorithmName]::SHA256
 \end{lstlisting}
@@ -229,7 +229,7 @@ November 26, 2001 \\
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 165-169):}
+\textbf{Implementation (Encrypt.ps1, lines 216-220):}
 \begin{lstlisting}[language=bash]
 $aes = [System.Security.Cryptography.Aes]::Create()
 $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
@@ -277,7 +277,7 @@ December 2001 \\
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, line 166):}
+\textbf{Implementation (Encrypt.ps1, line 217):}
 \begin{lstlisting}[language=bash]
 $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
 \end{lstlisting}
@@ -292,7 +292,7 @@ $aes.Mode = [System.Security.Cryptography.CipherMode]::CBC
 \end{quote}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 39, 151, 153):}
+\textbf{Implementation (Encrypt.ps1, lines 39, 202, 203):}
 \begin{lstlisting}[language=bash]
 $IV_SIZE = 16         # bytes (128 bits for AES block size)
 ...
@@ -459,7 +459,7 @@ NIST SP 800-171 & 3.13.11 FIPS crypto & Windows CNG & $\checkmark$* \\
 
 \subsection{Encryption/Decryption Round-Trip}
 
-The following test was performed on commit \texttt{394bcc1}:
+The following test was performed on commit \texttt{29804e7}:
 
 \begin{samepage}
 \begin{lstlisting}[language=bash]
@@ -487,7 +487,7 @@ Bytes 32+:    AES-256-CBC ciphertext (PKCS7 padded)
 \end{verbatim}
 
 \begin{samepage}
-\textbf{Implementation (Encrypt.ps1, lines 175-179):}
+\textbf{Implementation (Encrypt.ps1, lines 227-231):}
 \begin{lstlisting}[language=bash]
 # Combine: Salt + IV + Ciphertext
 $outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
@@ -501,7 +501,7 @@ $outputBytes = New-Object byte[] ($SALT_SIZE + $IV_SIZE + $cipherBytes.Length)
 \section{Conclusion}
 % ============================================================================
 
-SendCUIEmail v0.1.0 (commit \texttt{394bcc1}) demonstrates compliance with:
+SendCUIEmail v0.2.0 (commit \texttt{29804e7}) demonstrates compliance with:
 
 \begin{itemize}
     \item \textbf{NIST SP 800-132} - All password-based key derivation requirements met
@@ -520,6 +520,6 @@ For full NIST SP 800-171 \S3.13.11 compliance, Windows FIPS mode must be enabled
 \noindent\rule{\textwidth}{0.5pt}
 
 \textbf{Document prepared:} January 21, 2026 \\
-\textbf{Verified against commit:} \texttt{394bcc1e32afb4b985d5b0dbcb4bf35b231b44be}
+\textbf{Verified against commit:} \texttt{29804e71b88bc5db05451efea185f3c9da15687b}
 
 \end{document}

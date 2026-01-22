@@ -111,9 +111,16 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
     exit 1
 fi
 
-# Run tests first
+# Run tests first (full test suite including integration and verification PDF)
 echo -e "${CYAN}[1/6] Running tests...${NC}"
-if command -v pwsh &> /dev/null; then
+if [ -x "$SCRIPT_DIR/test.sh" ]; then
+    "$SCRIPT_DIR/test.sh"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}ERROR: Tests failed. Aborting release.${NC}"
+        exit 1
+    fi
+elif command -v pwsh &> /dev/null; then
+    echo -e "${YELLOW}WARNING: test.sh not found, running Test.ps1 only${NC}"
     pwsh -NoProfile -File "$SCRIPT_DIR/Test.ps1"
     if [ $? -ne 0 ]; then
         echo -e "${RED}ERROR: Tests failed. Aborting release.${NC}"
