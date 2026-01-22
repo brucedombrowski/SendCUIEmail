@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Quick-Start Guide PDF** - 2-page guide in Docs/QuickStart_Guide.pdf
+  - Part A: Encrypting Files (Sender) - 5 steps with color-coded boxes
+  - Part B: Decrypting Files (Recipient) - 5 steps
+  - Password visibility warning and compliance guidance
+
 ### v1.0.0 Target (Non-Technical User Release)
-- Quick-Start Guide PDF
+- ~~Quick-Start Guide PDF~~ (done)
 - Any UX improvements from developer beta feedback
 - Production-ready for non-technical CUI handlers
 
