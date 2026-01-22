@@ -673,9 +673,14 @@ if ($null -eq $password) {
 }
 Write-Host ""
 
+# Determine and display output location upfront
+$outputDir = Split-Path $files[0] -Parent
+Write-Host "Output folder:" -ForegroundColor Yellow
+Write-Host "  $outputDir" -ForegroundColor White
+Write-Host ""
+
 # Encrypt each file
 $encryptedFiles = @()
-$outputDir = $null
 
 Write-Host "Encrypting files (AES-256-CBC, FIPS 140-2)..." -ForegroundColor Cyan
 foreach ($file in $files) {
@@ -756,6 +761,11 @@ if ($encryptedFiles.Count -gt 0) {
     Write-Host "CLEANUP (after sending):" -ForegroundColor Yellow
     Write-Host "  - Delete .msg files from output folder" -ForegroundColor Yellow
     Write-Host "  - Password_Email contains plaintext password" -ForegroundColor Red
+    if ($IsWindowsPlatform) {
+        Write-Host ""
+        Write-Host "TIP: Open output folder:" -ForegroundColor Cyan
+        Write-Host "  explorer.exe `"$outputDir`"" -ForegroundColor Gray
+    }
 }
 else {
     Write-Host ""
