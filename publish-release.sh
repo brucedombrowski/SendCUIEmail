@@ -97,7 +97,7 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
 fi
 
 # Check for changes to commit
-echo -e "${CYAN}[1/5] Checking for changes...${NC}"
+echo -e "${CYAN}[1/7] Checking for changes...${NC}"
 if git diff-index --quiet HEAD -- 2>/dev/null; then
     echo -e "  ${YELLOW}No uncommitted changes found.${NC}"
     echo "  Did you run stage-release.sh first?"
@@ -124,7 +124,8 @@ if [ "$SKIP_CONFIRM" = false ]; then
     fi
     echo "  - Create tag: $TAG"
     echo "  - Push to remote"
-    echo "  - Create GitHub release"
+    echo "  - Delete old GitHub releases"
+    echo "  - Create new GitHub release"
     echo ""
     read -p "Proceed? (y/N) " -n 1 -r
     echo
@@ -136,7 +137,7 @@ fi
 
 # Step 2: Commit changes
 echo ""
-echo -e "${CYAN}[2/5] Committing changes...${NC}"
+echo -e "${CYAN}[2/7] Committing changes...${NC}"
 if [ "$NEED_COMMIT" = true ]; then
     git add -A
     git commit -m "Release v$VERSION"
@@ -147,7 +148,7 @@ fi
 
 # Step 3: Create tag
 echo ""
-echo -e "${CYAN}[3/5] Creating tag $TAG...${NC}"
+echo -e "${CYAN}[3/7] Creating tag $TAG...${NC}"
 
 # Extract release notes from CHANGELOG
 RELEASE_NOTES=""
@@ -165,14 +166,14 @@ echo -e "  ${GREEN}Tag created${NC}"
 
 # Step 4: Push to remote
 echo ""
-echo -e "${CYAN}[4/5] Pushing to remote...${NC}"
+echo -e "${CYAN}[4/7] Pushing to remote...${NC}"
 git push origin main
 git push origin "$TAG"
 echo -e "  ${GREEN}Pushed commits and tag${NC}"
 
 # Step 5: Create minimal release zip
 echo ""
-echo -e "${CYAN}[5/6] Creating release zip...${NC}"
+echo -e "${CYAN}[5/7] Creating release zip...${NC}"
 RELEASE_DIR="$SCRIPT_DIR/.release"
 ZIP_NAME="SendCUIEmail-v$VERSION.zip"
 ZIP_PATH="$RELEASE_DIR/$ZIP_NAME"
@@ -212,9 +213,28 @@ zip -r "$ZIP_NAME" SendCUIEmail > /dev/null
 cd "$SCRIPT_DIR"
 echo -e "  ${GREEN}Created: $ZIP_NAME${NC}"
 
-# Step 6: Create GitHub release
+# Step 6: Delete old GitHub releases
 echo ""
-echo -e "${CYAN}[6/6] Creating GitHub release...${NC}"
+echo -e "${CYAN}[6/7] Cleaning up old releases...${NC}"
+if command -v gh &> /dev/null; then
+    # Get list of old releases and delete them
+    OLD_RELEASES=$(gh release list --json tagName -q '.[].tagName' 2>/dev/null)
+    if [ -n "$OLD_RELEASES" ]; then
+        for old_tag in $OLD_RELEASES; do
+            echo -e "  Deleting release: $old_tag"
+            gh release delete "$old_tag" --yes 2>/dev/null || true
+            # Also delete the git tag from remote
+            git push origin ":refs/tags/$old_tag" 2>/dev/null || true
+        done
+        echo -e "  ${GREEN}Old releases removed${NC}"
+    else
+        echo -e "  No old releases to clean up"
+    fi
+fi
+
+# Step 7: Create GitHub release
+echo ""
+echo -e "${CYAN}[7/7] Creating GitHub release...${NC}"
 if command -v gh &> /dev/null; then
     # Build release notes for GitHub
     GH_NOTES="## What's New in v$VERSION
