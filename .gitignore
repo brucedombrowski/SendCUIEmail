@@ -19,6 +19,10 @@ Desktop.ini
 .LSOverride
 ._*
 
+# Editor files
+*.swp
+*~
+
 # VS Code
 .vscode/
 
